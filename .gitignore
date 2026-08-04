@@ -4,3 +4,8 @@ dist/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
+
+# Documentación e informes internos (no van al repositorio)
+README.md
+HYDRAPP-CONTEXTO.md
+MEJORA-UX-REGISTRO.md
