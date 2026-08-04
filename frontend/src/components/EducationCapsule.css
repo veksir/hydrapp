@@ -1,0 +1,42 @@
+.education-capsule {
+  background: linear-gradient(135deg, #EAF2FF, #E5FBFB);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.education-capsule__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary-deep);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.education-capsule__nav {
+  display: flex;
+  gap: 4px;
+}
+.education-capsule__nav button {
+  background: rgba(255, 255, 255, 0.7);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  color: var(--primary-deep);
+  font-size: 16px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.education-capsule p {
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.5;
+}
