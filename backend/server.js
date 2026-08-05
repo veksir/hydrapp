@@ -66,7 +66,7 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`HydrApp backend corriendo en http://192.168.80.57:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`HydrApp backend corriendo en http://localhost:${PORT}`);
   startThirstNotificationScheduler();
 });

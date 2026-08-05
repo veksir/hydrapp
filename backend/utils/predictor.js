@@ -131,16 +131,31 @@ function getHydrationStatus({
   let status = "ok";
   let message = "Vas al ritmo. Sigue así.";
 
+  // Umbrales PROPORCIONALES a la meta, no valores fijos — un déficit de
+  // 150ml es insignificante en una meta de 4000ml pero grave en una de
+  // 900ml (niños). Antes el umbral fijo de 150ml hacía que la app marcara
+  // "atrasado" casi todo el día en metas grandes. También se da un margen
+  // de gracia justo al despertar: literalmente al minuto de abrir los
+  // ojos ya se "espera" el primer checkpoint (~15% de la meta) — nadie
+  // toma agua en el segundo exacto en que despierta.
+  const GRACE_MINUTES_AFTER_WAKE = 30;
+  const atrasadoThreshold = Math.max(200, totalMl * 0.1);
+  const muyAtrasadoThreshold = Math.max(500, totalMl * 0.25);
+  const adelantadoThreshold = Math.max(200, totalMl * 0.1);
+
   if (isPastBedtime) {
     status = "ok";
     message = "Ya pasó tu hora de dormir. Descansa — retomamos mañana.";
-  } else if (deficit > 0.25 * totalMl && deficit > 300) {
+  } else if (adjNowMinute - wake < GRACE_MINUTES_AFTER_WAKE) {
+    status = "ok";
+    message = "Buenos días. Cuando puedas, arranca el día con un vaso de agua.";
+  } else if (deficit > muyAtrasadoThreshold) {
     status = "muy_atrasado";
     message = `Vas ${Math.round(deficit)}ml por detrás de tu ritmo esperado. Toma agua ahora.`;
-  } else if (deficit > 150) {
+  } else if (deficit > atrasadoThreshold) {
     status = "atrasado";
     message = `Estás un poco atrasado (${Math.round(deficit)}ml). Un vaso de agua ahora te pone al día.`;
-  } else if (deficit < -300) {
+  } else if (deficit < -adelantadoThreshold) {
     status = "adelantado";
     message = "Vas muy bien, incluso adelantado a tu meta de este momento.";
   }

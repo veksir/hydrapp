@@ -12,6 +12,7 @@ export default function History() {
   if (loading) return <div className="screen-center">Cargando historial...</div>;
 
   const hasAnyData = rows.some((r) => r.entries > 0);
+  const displayRows = rows.slice().reverse(); // más reciente (hoy) primero
 
   return (
     <div className="history">
@@ -28,10 +29,12 @@ export default function History() {
         <p className="setup-hint">Todavía no hay registros. Empieza a tomar agua hoy para ver tu progreso aquí.</p>
       ) : (
         <div className="card history__chart">
-          {rows.map((r) => (
+          {displayRows.map((r, i) => (
             <div className={`history__row ${r.entries === 0 ? "history__row--empty" : ""}`} key={r.date}>
               <span className="history__date">
-                {new Date(r.date + "T12:00:00").toLocaleDateString("es-CO", { day: "2-digit", month: "short" })}
+                {i === 0
+                  ? "Hoy"
+                  : new Date(r.date + "T12:00:00").toLocaleDateString("es-CO", { day: "2-digit", month: "short" })}
               </span>
               <div className="history__bar-track">
                 <div className="history__bar" style={{ width: `${Math.min(100, r.pct)}%` }} />

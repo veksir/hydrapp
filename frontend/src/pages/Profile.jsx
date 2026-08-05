@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { getCurrentWeather } from "../weather";
 import { useAuth } from "../context/AuthContext";
-import { pushSupported, getPushSubscriptionStatus, subscribeToPush, unsubscribeFromPush } from "../push";
+import { pushSupported, getPushSubscriptionStatus, subscribeToPush, unsubscribeFromPush, getPushUnavailableReason } from "../push";
 import { MapPin } from "lucide-react";
 
 const ACTIVITY_LEVEL_LABELS = {
@@ -289,8 +289,8 @@ export default function Profile() {
           Te avisamos con una notificación real del sistema, incluso con la app cerrada, cuando
           calculamos que probablemente vas a tener sed pronto.
         </p>
-        {!pushSupported() ? (
-          <p className="setup-hint">Tu navegador no soporta notificaciones push.</p>
+        {getPushUnavailableReason() ? (
+          <p className="setup-hint">{getPushUnavailableReason()}</p>
         ) : (
           <>
             <button className="btn-primary" onClick={handleTogglePush} disabled={pushLoading} type="button">
