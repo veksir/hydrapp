@@ -104,7 +104,17 @@ function getHydrationStatus({
   const checkpoints = buildCheckpoints({ wakeTime, sleepTime, totalMl, activityMinutes, workoutTime });
 
   const wake = toMinutes(wakeTime);
-  const adjNowMinute = nowMinuteOfDay < wake ? nowMinuteOfDay + 24 * 60 : nowMinuteOfDay;
+  // "Antes de la hora de despertar" es ambiguo: puede ser que sigan siendo
+  // las 2am de la noche anterior (casi hora de dormir, hay que arrastrar
+  // el día de ayer) o que la persona se levantó temprano de verdad (5-6am,
+  // su día de hoy simplemente no ha "empezado" según el perfil todavía).
+  // Se usan las 4am como corte razonable entre ambos casos — antes de eso,
+  // se asume que sigue siendo la noche anterior; después, que es un
+  // madrugador y su jornada arranca desde cero, sin deuda ni aviso de
+  // "hora de dormir".
+  const EARLY_RISER_CUTOFF_MINUTE = 4 * 60;
+  const isLikelyStillLastNight = nowMinuteOfDay < wake && nowMinuteOfDay < EARLY_RISER_CUTOFF_MINUTE;
+  const adjNowMinute = isLikelyStillLastNight ? nowMinuteOfDay + 24 * 60 : nowMinuteOfDay;
 
   // Encuentra el último checkpoint ya pasado y el próximo por llegar,
   // ambos comparando por HORA (no por cuánta agua llevas acumulada).

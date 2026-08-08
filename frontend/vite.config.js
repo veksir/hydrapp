@@ -12,6 +12,15 @@ export default defineConfig({
       injectManifest: {
         injectionPoint: 'self.__WB_MANIFEST',
       },
+      // Por defecto Vite solo genera el service worker en el build de
+      // producción (`npm run build`). Sin esto, probar notificaciones con
+      // `npm run dev` se queda colgado para siempre en
+      // `navigator.serviceWorker.ready`, porque no hay ningún service
+      // worker registrado que resolver.
+      devOptions: {
+        enabled: true,
+        type: 'module',
+      },
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       manifest: {

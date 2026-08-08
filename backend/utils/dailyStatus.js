@@ -29,21 +29,27 @@ const RECALIBRATION_BUFFER_MINUTES = 30;
 
 function effectiveWakeTime({ configuredWakeTime, todayLogs, nowMinute, tz }) {
   const configuredWake = toMinutes(configuredWakeTime);
-  const adjNow = nowMinute < configuredWake ? nowMinute + 1440 : nowMinute;
+
+  // Si todavía no llegaste a tu hora configurada de despertar (te
+  // levantaste temprano, o de verdad sigue siendo de madrugada), no hay
+  // "inicio tardío" que recalibrar — tu día simplemente no ha empezado
+  // según el perfil todavía, y eso está bien, no es una deuda.
+  if (nowMinute < configuredWake) {
+    return configuredWakeTime;
+  }
 
   if (todayLogs.length === 0) {
-    if (adjNow - configuredWake > LATE_START_GRACE_MINUTES) {
-      return minutesToHHMM(adjNow - RECALIBRATION_BUFFER_MINUTES);
+    if (nowMinute - configuredWake > LATE_START_GRACE_MINUTES) {
+      return minutesToHHMM(nowMinute - RECALIBRATION_BUFFER_MINUTES);
     }
     return configuredWakeTime;
   }
 
   const firstLogDate = new Date(parseUtcTimestamp(todayLogs[0].logged_at));
   const firstLogMinute = localMinuteOfDay(tz, firstLogDate);
-  const adjFirstLog = firstLogMinute < configuredWake ? firstLogMinute + 1440 : firstLogMinute;
 
-  if (adjFirstLog - configuredWake > LATE_START_GRACE_MINUTES) {
-    return minutesToHHMM(Math.max(configuredWake, adjFirstLog - RECALIBRATION_BUFFER_MINUTES));
+  if (firstLogMinute >= configuredWake && firstLogMinute - configuredWake > LATE_START_GRACE_MINUTES) {
+    return minutesToHHMM(Math.max(configuredWake, firstLogMinute - RECALIBRATION_BUFFER_MINUTES));
   }
   return configuredWakeTime;
 }
