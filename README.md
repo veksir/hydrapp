@@ -345,6 +345,71 @@ iteración de diseño.
   frontend la invierte para mostrar hoy arriba, etiquetado como "Hoy" en
   vez de la fecha.
 
+## 11. Arreglos tras uso real (tercera vuelta)
+
+- **Notificaciones atascadas en "Procesando..." en PC**: Vite solo genera el
+  service worker en el build de producción por defecto; en `npm run dev` no
+  hay ninguno registrado, así que `navigator.serviceWorker.ready` (que el
+  botón de notificaciones espera) nunca se resolvía. Ahora `devOptions` está
+  activado en `vite.config.js`, así que también funciona en desarrollo.
+  Recuerda: las notificaciones push son avisos del **sistema operativo**,
+  aparecen fuera de la ventana del navegador (como una alerta de Windows/
+  macOS en la esquina de la pantalla), no dentro de la app.
+- **Despertarte antes de la hora configurada generaba una "deuda" falsa**:
+  este fue un efecto secundario del arreglo de la vuelta anterior (la
+  recalibración por "inicio tardío" se disparaba también al despertar
+  *temprano*, no solo tarde). Confirmé el bug exacto y lo corregí: ahora
+  solo recalibra cuando de verdad vas después de tu hora configurada; si
+  te levantas antes, tu día simplemente "no ha empezado" según el perfil
+  (sin deuda, mensaje de "buenos días, cuando puedas empieza"). De paso
+  corregí un problema relacionado en el motor base: antes de las 4am se
+  sigue tratando como "todavía es de noche" (correcto, avisa que ya es
+  hora de dormir), pero de las 4am en adelante y antes de tu hora de
+  despertar, se reconoce como madrugador real, no como trasnochador.
+  Probé los tres casos (madrugador, horario normal, trasnochador de
+  verdad) por separado. Ver `backend/utils/dailyStatus.js` y
+  `backend/utils/predictor.js`.
+
+## 12. Arreglos de seguridad (auditoría formal)
+
+- **1.1 Tráfico en claro**: no aplica a Render/Vercel (HTTPS automático);
+  era sobre el `.env` de pruebas locales. Recordatorio: nunca compartas ni
+  compiles con `VITE_API_URL` apuntando a una IP local.
+- **1.2 JWT de larga vida**: se redujo de 30 a 14 días. Sigue siendo deuda
+  documentada (sin revocación real salvo borrar la cuenta), pero la
+  ventana de exposición de un token robado ya es menor.
+- **1.3 CORS abierto por defecto**: ya soportado, solo falta que definas
+  `FRONTEND_ORIGIN` en las variables de entorno de Render apuntando a tu
+  dominio de Vercel.
+- **2.1 Dependencias del frontend**: `fast-uri` corregido con
+  `npm audit fix`. `react-router-dom` sigue marcado por `npm audit`, pero no
+  hay ninguna versión publicada libre del aviso ahora mismo — confirmé que
+  el proyecto no pasa datos controlados por el usuario a `navigate()` ni a
+  `<Link to>` en ningún lado, que es la superficie real que explota ese
+  aviso, así que el riesgo práctico es mínimo mientras se mantiene en la
+  última versión (7.18.2).
+- **2.3 Contraseña mínima**: subida de 6 a 8 caracteres (backend y
+  frontend sincronizados).
+- **2.4 Rate limit solo por IP**: se agregó un límite adicional **por
+  cuenta** (10 intentos/15min, independiente de la IP) para cubrir ataques
+  con IP rotativa — probado que bloquea a la cuenta atacada sin afectar a
+  otras cuentas.
+- **2.6 Sin cabeceras de seguridad**: agregado `helmet` (HSTS,
+  X-Content-Type-Options, X-Frame-Options, etc.).
+- **2.8 Suscripciones push sin tope**: máximo 10 por usuario; al superarse
+  se borran las más viejas. Probado con 12 suscripciones → quedan 10.
+- **Higiene del repo**: `frontend/dev-dist/` agregado al `.gitignore`.
+
+### No modificado (decisiones documentadas)
+
+- **2.2 Enumeración de cuentas** (registro dice si el email ya existe): se
+  deja así a propósito — informarle al usuario "ya tienes cuenta, inicia
+  sesión" es mejor UX que ocultarlo, y el riesgo es bajo para esta app.
+- **2.5 Sin verificación de email / recuperación de contraseña**: ya
+  documentado como pendiente de v2.
+- **2.7 Logs con stack completo**: solo se loguea server-side (consola),
+  nunca se expone al cliente — aceptable para esta escala.
+
 ## 8. Qué sigue (v2)
 
 - Asistente conversacional de dudas sobre hidratación (Groq API, gratis)
