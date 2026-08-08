@@ -10,6 +10,8 @@ router.get("/vapid-public-key", (req, res) => {
   res.json({ enabled: pushEnabled, publicKey: pushEnabled ? VAPID_PUBLIC_KEY : null });
 });
 
+const MAX_SUBSCRIPTIONS_PER_USER = 10;
+
 router.post("/subscribe", (req, res) => {
   const { endpoint, keys } = req.body || {};
   if (!endpoint || !keys?.p256dh || !keys?.auth) {
@@ -21,6 +23,20 @@ router.post("/subscribe", (req, res) => {
      VALUES (?, ?, ?, ?)
      ON CONFLICT(endpoint) DO UPDATE SET user_id = excluded.user_id, p256dh = excluded.p256dh, auth = excluded.auth`
   ).run(req.userId, endpoint, keys.p256dh, keys.auth);
+
+  // Sin tope, un usuario (o alguien abusando de una cuenta) podría inflar
+  // la tabla con endpoints ilimitados. 10 alcanza de sobra para cualquier
+  // combinación real de dispositivos de una persona; si se excede, se
+  // borran las suscripciones más viejas.
+  const count = db.prepare("SELECT COUNT(*) as c FROM push_subscriptions WHERE user_id = ?").get(req.userId).c;
+  if (count > MAX_SUBSCRIPTIONS_PER_USER) {
+    db.prepare(
+      `DELETE FROM push_subscriptions WHERE id IN (
+         SELECT id FROM push_subscriptions WHERE user_id = ?
+         ORDER BY created_at ASC LIMIT ?
+       )`
+    ).run(req.userId, count - MAX_SUBSCRIPTIONS_PER_USER);
+  }
 
   res.status(201).json({ ok: true });
 });

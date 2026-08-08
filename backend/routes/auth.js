@@ -28,6 +28,40 @@ const registerLimiter = rateLimit({
   message: { error: "Demasiados intentos de registro. Espera unos minutos e intenta de nuevo." },
 });
 
+// El rate limit de arriba es por IP — un atacante con IPs rotativas (proxy,
+// botnet) lo evade fácilmente mientras sigue probando contraseñas contra
+// LA MISMA cuenta. Este segundo control es por email, independiente de la
+// IP, para cerrar ese hueco. Vive en memoria (se resetea si el proceso se
+// reinicia) — suficiente para una app de este tamaño en un solo proceso;
+// si el backend llegara a correr en varias instancias, habría que mover
+// esto a la base de datos o a un store compartido (ej. Redis).
+const MAX_ATTEMPTS_PER_ACCOUNT = 10;
+const ACCOUNT_WINDOW_MS = 15 * 60 * 1000;
+const failedAttemptsByEmail = new Map();
+
+function isAccountLocked(email) {
+  const entry = failedAttemptsByEmail.get(email);
+  if (!entry) return false;
+  if (Date.now() - entry.firstAttemptAt > ACCOUNT_WINDOW_MS) {
+    failedAttemptsByEmail.delete(email);
+    return false;
+  }
+  return entry.count >= MAX_ATTEMPTS_PER_ACCOUNT;
+}
+
+function registerFailedAttempt(email) {
+  const entry = failedAttemptsByEmail.get(email);
+  if (!entry || Date.now() - entry.firstAttemptAt > ACCOUNT_WINDOW_MS) {
+    failedAttemptsByEmail.set(email, { count: 1, firstAttemptAt: Date.now() });
+  } else {
+    entry.count += 1;
+  }
+}
+
+function clearFailedAttempts(email) {
+  failedAttemptsByEmail.delete(email);
+}
+
 router.post("/register", registerLimiter, async (req, res, next) => {
   try {
     const { email, password, name } = req.body;
@@ -35,8 +69,8 @@ router.post("/register", registerLimiter, async (req, res, next) => {
     if (!email || typeof email !== "string" || email.length > 254 || !EMAIL_RE.test(email.trim())) {
       return res.status(400).json({ error: "Ingresa un email válido" });
     }
-    if (!password || password.length < 6) {
-      return res.status(400).json({ error: "La contraseña debe tener al menos 6 caracteres" });
+    if (!password || password.length < 8) {
+      return res.status(400).json({ error: "La contraseña debe tener al menos 8 caracteres" });
     }
     if (!name || typeof name !== "string" || !name.trim()) {
       return res.status(400).json({ error: "El nombre es requerido" });
@@ -55,7 +89,7 @@ router.post("/register", registerLimiter, async (req, res, next) => {
       .prepare("INSERT INTO users (email, password_hash, name) VALUES (?, ?, ?)")
       .run(normalizedEmail, passwordHash, safeName);
 
-    const token = jwt.sign({ userId: result.lastInsertRowid }, JWT_SECRET, { expiresIn: "30d" });
+    const token = jwt.sign({ userId: result.lastInsertRowid }, JWT_SECRET, { expiresIn: "14d" });
 
     res.status(201).json({
       token,
@@ -74,12 +108,21 @@ router.post("/login", loginLimiter, async (req, res, next) => {
     }
 
     const normalizedEmail = String(email).trim().toLowerCase();
-    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(normalizedEmail);
-    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-      return res.status(401).json({ error: "Credenciales inválidas" });
+
+    if (isAccountLocked(normalizedEmail)) {
+      return res.status(429).json({
+        error: "Demasiados intentos fallidos para esta cuenta. Espera unos minutos e intenta de nuevo.",
+      });
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "30d" });
+    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(normalizedEmail);
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+      registerFailedAttempt(normalizedEmail);
+      return res.status(401).json({ error: "Credenciales inválidas" });
+    }
+    clearFailedAttempts(normalizedEmail);
+
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: "14d" });
     res.json({
       token,
       user: { id: user.id, email: user.email, name: user.name },

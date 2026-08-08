@@ -45,7 +45,8 @@ export default function Register() {
         </div>
         <div className="field">
           <label htmlFor="password">Contraseña</label>
-          <input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input id="password" type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
+          <p className="setup-hint">Mínimo 8 caracteres.</p>
         </div>
         {error && <p className="error-text">{error}</p>}
         <button className="btn-primary" type="submit" disabled={loading}>

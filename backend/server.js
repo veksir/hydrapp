@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 
 const authRoutes = require("./routes/auth");
 const profileRoutes = require("./routes/profile");
@@ -12,6 +13,12 @@ const pushRoutes = require("./routes/push");
 const { startThirstNotificationScheduler } = require("./utils/pushScheduler");
 
 const app = express();
+
+// Cabeceras de seguridad básicas (HSTS, X-Content-Type-Options,
+// X-Frame-Options, etc.). CSP se desactiva acá porque es una API pura sin
+// vistas HTML propias — el CSP real le corresponde al hosting del frontend
+// (Vercel), que sirve el HTML/JS real.
+app.use(helmet({ contentSecurityPolicy: false }));
 
 // Detrás de un proxy (Nginx, como en el despliegue del README), Express ve
 // siempre la IP del proxy en vez de la del visitante real. Sin esto,
