@@ -233,6 +233,108 @@
   font-size: 14px;
 }
 
+.symptom-cta--assistant {
+  background: linear-gradient(120deg, var(--secondary), var(--primary));
+}
+
+/* ---------- Assistant chat ---------- */
+.assistant-screen {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 140px);
+  gap: 12px;
+}
+
+.assistant-chat {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 2px;
+}
+
+.assistant-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.assistant-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.assistant-suggestion {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 14px;
+  color: var(--primary-deep);
+  font-weight: 600;
+}
+.assistant-suggestion:hover { background: var(--surface-sunk); }
+
+.assistant-bubble {
+  max-width: 82%;
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.assistant-bubble--user {
+  align-self: flex-end;
+  background: var(--primary);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+.assistant-bubble--assistant {
+  align-self: flex-start;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 12px rgba(16, 24, 40, 0.06);
+  border-bottom-left-radius: 4px;
+}
+
+.assistant-bubble--typing {
+  display: flex;
+  gap: 4px;
+  padding: 14px 16px;
+}
+.assistant-bubble--typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-soft);
+  animation: assistant-typing 1s infinite ease-in-out;
+}
+.assistant-bubble--typing span:nth-child(2) { animation-delay: 0.15s; }
+.assistant-bubble--typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes assistant-typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+.assistant-input {
+  display: flex;
+  gap: 8px;
+  padding: 4px 2px 0;
+}
+.assistant-input input {
+  flex: 1;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+.assistant-input input:focus { border-color: var(--primary); }
+
+@media (prefers-reduced-motion: reduce) {
+  .assistant-bubble--typing span { animation: none; opacity: 0.7; }
+}
+
 .symptom-screen {
   padding: 4px 0 20px;
   display: flex;

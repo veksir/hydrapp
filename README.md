@@ -410,6 +410,30 @@ iteración de diseño.
 - **2.7 Logs con stack completo**: solo se loguea server-side (consola),
   nunca se expone al cliente — aceptable para esta escala.
 
+## 13. Asistente conversacional (Groq, gratis)
+
+La última pieza grande del plan original ya está implementada:
+
+1. Crea una key gratis en https://console.groq.com
+2. Ponla en `backend/.env`: `GROQ_API_KEY=...` (opcional: `GROQ_MODEL`, por
+   defecto `llama-3.3-70b-versatile`)
+3. Sin esto configurado, la app funciona igual — el botón del asistente
+   muestra un mensaje claro de que no está disponible, no un error feo.
+
+El asistente conoce tu perfil y tu estado de hoy (peso, edad, actividad,
+meta, cuánto llevas) para personalizar respuestas sin que tengas que
+repetírselo, está limitado a temas de hidratación (redirige si le
+preguntas otra cosa), y aclara que no es un médico. Historial de la
+conversación se manda completo en cada request (sin memoria persistente
+en el servidor) — ver `backend/routes/assistant.js` y
+`backend/utils/assistant.js`.
+
+**Nota de prueba**: no pude probar la llamada real a Groq desde mi entorno
+de desarrollo (sin salida de red a `api.groq.com`) — sí verifiqué toda la
+lógica que no depende de la API externa (validaciones, fallback sin key,
+construcción del contexto). Prueba la conversación real tú con tu propia
+key.
+
 ## 8. Qué sigue (v2)
 
 - Asistente conversacional de dudas sobre hidratación (Groq API, gratis)

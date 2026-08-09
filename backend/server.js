@@ -10,6 +10,7 @@ const logRoutes = require("./routes/logs");
 const symptomRoutes = require("./routes/symptoms");
 const insightsRoutes = require("./routes/insights");
 const pushRoutes = require("./routes/push");
+const assistantRoutes = require("./routes/assistant");
 const { startThirstNotificationScheduler } = require("./utils/pushScheduler");
 
 const app = express();
@@ -62,6 +63,7 @@ app.use("/api/logs", logRoutes);
 app.use("/api/symptoms", symptomRoutes);
 app.use("/api/insights", insightsRoutes);
 app.use("/api/push", pushRoutes);
+app.use("/api/assistant", assistantRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: "Ruta no encontrada" });

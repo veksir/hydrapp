@@ -72,6 +72,9 @@ export const api = {
   pushSubscribe: (subscription) => request("/push/subscribe", { method: "POST", body: subscription }),
   pushUnsubscribe: (payload) => request("/push/unsubscribe", { method: "POST", body: payload }),
   pushTest: () => request("/push/test", { method: "POST" }),
+
+  getAssistantStatus: () => request("/assistant/status"),
+  assistantChat: (messages) => request("/assistant/chat", { method: "POST", body: { messages } }),
 };
 
 export { getToken };

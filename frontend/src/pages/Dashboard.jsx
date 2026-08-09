@@ -245,6 +245,11 @@ export default function Dashboard({ user }) {
         <span aria-hidden="true">→</span>
       </button>
 
+      <button className="symptom-cta symptom-cta--assistant" onClick={() => navigate("/asistente")}>
+        <span>¿Dudas de hidratación? Pregúntale al asistente</span>
+        <span aria-hidden="true">→</span>
+      </button>
+
       <CenterAlert feedback={logFeedback} onClose={() => setLogFeedback(null)} />
 
       <LogDrinkSheet

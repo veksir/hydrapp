@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import SymptomCheck from "./pages/SymptomCheck";
 import Insights from "./pages/Insights";
+import Assistant from "./pages/Assistant";
 import NotFound from "./pages/NotFound";
 import BottomNav from "./components/BottomNav";
 
@@ -76,6 +77,14 @@ export default function App() {
         element={
           <PrivateLayout>
             <SymptomCheck />
+          </PrivateLayout>
+        }
+      />
+      <Route
+        path="/asistente"
+        element={
+          <PrivateLayout>
+            <Assistant />
           </PrivateLayout>
         }
       />
