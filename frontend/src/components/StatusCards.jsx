@@ -1,4 +1,4 @@
-import { Brain, HeartPulse, Thermometer, Footprints } from "lucide-react";
+import { Brain, HeartPulse, Thermometer, Footprints, ChevronRight } from "lucide-react";
 import "./StatusCards.css";
 
 const CONCENTRATION_BY_STATUS = {
@@ -45,11 +45,12 @@ export default function StatusCards({ hydrationStatus, tempC, climateBonusMl, ac
         c.onClick ? (
           <button key={c.label} className={`status-card status-card--${c.tone} status-card--clickable`} onClick={c.onClick}>
             <span className="status-card__icon"><c.icon size={18} /></span>
-            <div>
+            <div className="status-card__body">
               <p className="status-card__label">{c.label}</p>
               <p className="status-card__value">{c.value}</p>
               {c.sub && <p className="status-card__sub">{c.sub}</p>}
             </div>
+            <ChevronRight size={16} className="status-card__chevron" />
           </button>
         ) : (
           <div key={c.label} className={`status-card status-card--${c.tone}`}>

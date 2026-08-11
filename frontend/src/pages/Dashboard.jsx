@@ -208,8 +208,17 @@ export default function Dashboard({ user }) {
       </section>
 
       <section className="card dashboard__hero">
-        <RingProgress percent={percent} consumedMl={data.consumed_ml} goalMl={data.goal.total_ml} tone={ringTone} />
+        <button
+          className="dashboard__ring-button"
+          onClick={() => setSheetOpen(true)}
+          aria-label="Registrar bebida"
+        >
+          <RingProgress percent={percent} consumedMl={data.consumed_ml} goalMl={data.goal.total_ml} tone={ringTone} />
+        </button>
         <p className="dashboard__message">{data.hydration.message}</p>
+        {data.consumed_ml === 0 && (
+          <p className="dashboard__first-hint">Toca el anillo o el botón + de abajo para registrar tu primer trago</p>
+        )}
       </section>
 
       <TodayLogs logs={data.logs} onDelete={handleDeleteLog} highlightId={highlightId} />

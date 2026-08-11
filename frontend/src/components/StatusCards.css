@@ -17,10 +17,20 @@
 .status-card--clickable {
   text-align: left;
   width: 100%;
-  transition: transform 0.1s ease, border-color 0.15s ease;
+  border-color: var(--primary);
+  background: #E9F1FE;
+  transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease;
 }
-.status-card--clickable:hover { border-color: var(--primary); }
+.status-card--clickable:hover { border-color: var(--primary-deep); background: #DCE8FD; }
 .status-card--clickable:active { transform: scale(0.97); }
+.status-card--clickable .status-card__sub { color: var(--primary); font-weight: 600; }
+
+.status-card__body { flex: 1; min-width: 0; }
+
+.status-card__chevron {
+  color: var(--primary);
+  flex-shrink: 0;
+}
 
 .status-card__icon {
   color: var(--primary);

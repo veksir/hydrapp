@@ -202,6 +202,23 @@
   line-height: 1.5;
 }
 
+.dashboard__ring-button {
+  background: transparent;
+  padding: 0;
+  border-radius: 50%;
+  transition: transform 0.15s ease;
+}
+.dashboard__ring-button:active { transform: scale(0.97); }
+
+.dashboard__first-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-deep);
+  background: var(--surface-sunk);
+  padding: 8px 14px;
+  border-radius: 999px;
+}
+
 /* ---------- Weather card ---------- */
 .dashboard__weather {
   padding: 14px 18px;
