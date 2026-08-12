@@ -45,39 +45,45 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   (meta cumplida + sed probable) en local: no se generó push.
 - **Commit:** `bd4ab29` — 2026-08-11 (branch `fix/push-goal-met`, mergeada a main).
 
-## Bugs pendientes (del audit de seguridad/calidad, sin corregir a la fecha)
-
-Confirmados leyendo el código actual (no son solo hipótesis del audit):
-
 ### 2. Race condition en el borrado de logs desde la UI
 - **Archivos:** `frontend/src/components/TodayLogs.jsx` (`handleDelete`) y
-  `frontend/src/pages/Dashboard.jsx` (`handleDeleteLog`, línea ~163).
-- **Problema:** `handleDelete` en TodayLogs marca el id como "removiendo"
-  (para la animación CSS) y recién 240ms después llama a `onDelete(id)`,
-  que en Dashboard hace `await api.deleteLog(id)` + `await load()`. No hay
+  `frontend/src/pages/Dashboard.jsx` (`handleDeleteLog`).
+- **Problema:** `handleDelete` en TodayLogs marcaba el id como "removiendo"
+  (para la animación CSS) y recién 240ms después llamaba a `onDelete(id)`,
+  que en Dashboard hace `await api.deleteLog(id)` + `await load()`. No había
   guard contra doble-click/doble-tap antes de que se dispare ese timeout —
-  se puede llamar `api.deleteLog` dos veces con el mismo id (la segunda
-  devuelve error y se muestra un mensaje de error aunque el borrado ya
-  haya funcionado). Tampoco hay guard si el polling automático (cada 60s,
-  ver README sección 6) recarga `data.logs` mientras la animación de 240ms
-  está en curso.
-- **Fix esperado:** deshabilitar el botón de borrar (o filtrar por
-  `removingIds`) mientras un id ya está en proceso de borrado, y idealmente
-  mover el `await onDelete(id)` real antes de la animación (optimistic UI)
-  en vez de después.
+  se podía llamar `api.deleteLog` dos veces con el mismo id (la segunda
+  devolvía error y se mostraba un mensaje de error aunque el borrado ya
+  hubiera funcionado). Tampoco había guard si el polling automático recargaba
+  `data.logs` mientras la animación de 240ms estaba en curso.
+- **Fix aplicado:** guard síncrono `removingRef` (useRef) que bloquea un
+  segundo `handleDelete(id)` encolado por doble-click/tap (el `window.confirm`
+  bloquea el hilo y podía dejar un segundo callback en cola antes del
+  re-render). El botón además queda `disabled` mientras `isRemoving`. Si el
+  borrado real falla, el catch libera el guard para permitir reintentar en vez
+  de dejar la fila trabada. `handleDeleteLog` en Dashboard re-lanza el error
+  para que el componente hijo sepa que falló.
+- **Commit:** pendiente — branch `fix/delete-race-and-weather-nulls`.
 
 ### 3. Null handling en el override de clima
-- **Estado real tras revisar el código:** esto parece **más resuelto de lo
-  que sugería el audit**. `backend/routes/logs.js` (líneas ~42-50) ya valida
+- **Estado real tras revisar el código:** `backend/routes/logs.js` ya validaba
   `temp_override`/`humidity_override` como número finito o `null`/`undefined`
   explícitamente, y `dailyStatus.js`/`historicalGoal.js`/`insights.js` usan
   `??` (nullish coalescing) contra `profile.climate_temp` en todos los
-  puntos de lectura. **Antes de asumir que sigue roto, re-verificar contra
-  el hallazgo específico del audit** — puede que ya se haya corregido en un
-  commit posterior y solo falte tacharlo de la lista, o puede que el bug
-  esté en un caso más puntual (ej. `frontend/src/weather.js` no valida que
-  `data.current` exista antes de leer `.temperature_2m` si Open-Meteo
-  devuelve una respuesta sin ese campo — ahí sí falta un chequeo).
+  puntos de lectura. **El caso que sí faltaba** era `frontend/src/weather.js`:
+  no validaba que `data.current` exista ni que `temperature_2m`/
+  `relative_humidity_2m` sean números antes de leerlos.
+- **Fix aplicado:** `getCurrentWeather` ahora valida que
+  `data?.current?.temperature_2m` y `data?.current?.relative_humidity_2m` sean
+  números; si no, lanza el mismo mensaje controlado
+  ("No se pudo consultar el clima") en vez de un TypeError crudo. Verificado
+  con mocks: respuesta sin `current`, sin `temperature_2m`, y HTTP error →
+  siempre mensaje controlado; respuesta válida resuelve correctamente.
+- **Commit:** pendiente — branch `fix/delete-race-and-weather-nulls`.
+
+## Bugs pendientes (del audit de seguridad/calidad, sin corregir a la fecha)
+
+Confirmados leyendo el código actual (no son solo hipótesis del audit):
 
 ## Convenciones del repo (ya decididas, no re-discutir)
 

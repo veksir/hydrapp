@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trash2 } from "lucide-react";
 import { DrinkIcon } from "../drinkIcons";
@@ -11,6 +11,11 @@ export default function TodayLogs({ logs, onDelete, highlightId }) {
   const navigate = useNavigate();
   const [removingIds, setRemovingIds] = useState(new Set());
   const [showAll, setShowAll] = useState(false);
+  // Guard síncrono aparte del estado: window.confirm() bloquea el hilo, así
+  // que un doble click/tap puede dejar un segundo handleDelete(id) encolado
+  // que se ejecuta antes de que el re-render con removingIds se aplique. Un
+  // ref evita esa ventana.
+  const removingRef = useRef(new Set());
 
   if (!logs.length) return null;
 
@@ -19,9 +24,27 @@ export default function TodayLogs({ logs, onDelete, highlightId }) {
   const hiddenCount = ordered.length - visible.length;
 
   async function handleDelete(id) {
+    if (removingRef.current.has(id)) return;
     if (!window.confirm("¿Eliminar este registro?")) return;
+    removingRef.current.add(id);
     setRemovingIds((prev) => new Set(prev).add(id));
-    setTimeout(() => onDelete(id), REMOVE_ANIM_MS);
+    setTimeout(async () => {
+      try {
+        await onDelete(id);
+        // Éxito: el log va a desaparecer de `logs` en el próximo render
+        // (viene del padre tras recargar), no hace falta limpiar el guard
+        // a mano — igual lo dejamos, ese id ya no debería volver a existir.
+      } catch {
+        // Falló el borrado real: liberar el guard para permitir reintentar
+        // en vez de dejar la fila trabada para siempre.
+        removingRef.current.delete(id);
+        setRemovingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(id);
+          return next;
+        });
+      }
+    }, REMOVE_ANIM_MS);
   }
 
   return (
@@ -77,7 +100,12 @@ function TodayLogRow({ log, isNew, isRemoving, onDelete }) {
           })}
         </span>
       </div>
-      <button className="today-logs__delete" onClick={onDelete} aria-label="Eliminar registro">
+      <button
+        className="today-logs__delete"
+        onClick={onDelete}
+        disabled={isRemoving}
+        aria-label="Eliminar registro"
+      >
         <Trash2 size={15} />
       </button>
     </li>

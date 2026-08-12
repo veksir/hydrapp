@@ -21,6 +21,12 @@ export function getCurrentWeather() {
           const res = await fetch(url);
           if (!res.ok) throw new Error("No se pudo consultar el clima");
           const data = await res.json();
+          if (
+            typeof data?.current?.temperature_2m !== "number" ||
+            typeof data?.current?.relative_humidity_2m !== "number"
+          ) {
+            throw new Error("No se pudo consultar el clima");
+          }
           resolve({ tempC: data.current.temperature_2m, humidityPct: data.current.relative_humidity_2m });
         } catch (err) {
           reject(err);

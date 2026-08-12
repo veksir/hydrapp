@@ -166,6 +166,10 @@ export default function Dashboard({ user }) {
       await load();
     } catch (err) {
       setLogFeedback({ level: "danger", message: err.message });
+      // Re-lanzar para que TodayLogs sepa que el borrado falló y pueda
+      // liberar su guard (si no, el registro queda trabado y no se
+      // puede reintentar borrar sin refrescar la página).
+      throw err;
     }
   }
 
