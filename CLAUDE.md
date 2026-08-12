@@ -63,7 +63,7 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   borrado real falla, el catch libera el guard para permitir reintentar en vez
   de dejar la fila trabada. `handleDeleteLog` en Dashboard re-lanza el error
   para que el componente hijo sepa que falló.
-- **Commit:** pendiente — branch `fix/delete-race-and-weather-nulls`.
+- **Commit:** `6db65b8` — 2026-08-11 (branch `fix/delete-race-and-weather-nulls`, mergeada a main).
 
 ### 3. Null handling en el override de clima
 - **Estado real tras revisar el código:** `backend/routes/logs.js` ya validaba
@@ -79,11 +79,7 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   ("No se pudo consultar el clima") en vez de un TypeError crudo. Verificado
   con mocks: respuesta sin `current`, sin `temperature_2m`, y HTTP error →
   siempre mensaje controlado; respuesta válida resuelve correctamente.
-- **Commit:** pendiente — branch `fix/delete-race-and-weather-nulls`.
-
-## Bugs pendientes (del audit de seguridad/calidad, sin corregir a la fecha)
-
-Confirmados leyendo el código actual (no son solo hipótesis del audit):
+- **Commit:** `6db65b8` — 2026-08-11 (branch `fix/delete-race-and-weather-nulls`, mergeada a main).
 
 ## Convenciones del repo (ya decididas, no re-discutir)
 
