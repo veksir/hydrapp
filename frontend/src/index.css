@@ -16,6 +16,26 @@
   --warning: #F4C542;      /* precaución */
   --danger: #FF6B6B;       /* riesgo */
 
+  /* Fondos "tint" (versión suave de success/warning/danger/primary sobre
+     superficie clara) y su texto a juego — usados en pills, íconos de
+     alerta, celdas de calendario, hover de opciones, etc. Centralizados
+     acá (en vez de hex sueltos por componente) para que el tema oscuro
+     los pueda sobreescribir en un solo lugar. */
+  --success-tint: #E4F8ED;
+  --success-tint-ink: #1E8A50;
+  --warning-tint: #FDF3DC;
+  --warning-tint-ink: #B87A17;
+  --danger-tint: #FFEBEB;
+  --danger-tint-ink: #C13F3F;
+  --primary-tint: #EAF2FF;
+  --primary-tint-strong: #DCE8FD;
+  --primary-tint-border: #CFE0FB;
+
+  --capsule-gradient-start: #EAF2FF;
+  --capsule-gradient-end: #E5FBFB;
+  --capsule-nav-bg: rgba(255, 255, 255, 0.7);
+  --auth-hero-gradient: #E5F0FF;
+
   --font-display: 'Inter', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'Inter', sans-serif;
@@ -31,6 +51,48 @@
   color-scheme: light;
 }
 
+/* ---------- Modo oscuro ----------
+   Se activa con [data-theme="dark"] en <html>, controlado por
+   context/ThemeContext.jsx (persistido en localStorage, con opción
+   "sistema" que sigue prefers-color-scheme). El script inline en
+   index.html aplica el atributo antes del primer render para evitar
+   flash de tema incorrecto.
+   Los colores de marca (primary/secondary/success/warning/danger) se
+   mantienen — solo cambian fondo/superficie/texto y los "tint" para que
+   sigan siendo legibles sobre fondo oscuro. */
+:root[data-theme="dark"] {
+  --bg: #0B1220;
+  --surface: #141B2C;
+  --surface-sunk: #1C2438;
+  --ink: #EDF1F9;
+  --ink-soft: #8B96AC;
+  --border: #2A3350;
+
+  --primary: #5B9BF5;
+  --primary-deep: #7FB0FF;
+  --secondary: #4FDCDC;
+  --success: #5FD895;
+  --warning: #F7D373;
+  --danger: #FF8585;
+
+  --success-tint: #123527;
+  --success-tint-ink: #6FE0A6;
+  --warning-tint: #3A2E10;
+  --warning-tint-ink: #F0C463;
+  --danger-tint: #3A1818;
+  --danger-tint-ink: #FF9D9D;
+  --primary-tint: #182644;
+  --primary-tint-strong: #223258;
+  --primary-tint-border: #2E3F66;
+
+  --capsule-gradient-start: #16233F;
+  --capsule-gradient-end: #12303A;
+  --capsule-nav-bg: rgba(255, 255, 255, 0.08);
+  --auth-hero-gradient: #16233F;
+
+  color-scheme: dark;
+}
+
 * { box-sizing: border-box; }
 
 html, body, #root { height: 100%; }
@@ -42,6 +104,7 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   overscroll-behavior-y: contain;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #root {
@@ -138,6 +201,7 @@ input, select {
   background: var(--surface);
   border-radius: var(--radius-lg);
   box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 12px rgba(16, 24, 40, 0.06);
+  transition: background-color 0.2s ease;
 }
 
 .error-text {

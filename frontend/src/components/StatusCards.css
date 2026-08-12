@@ -18,10 +18,10 @@
   text-align: left;
   width: 100%;
   border-color: var(--primary);
-  background: #E9F1FE;
+  background: var(--primary-tint);
   transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease;
 }
-.status-card--clickable:hover { border-color: var(--primary-deep); background: #DCE8FD; }
+.status-card--clickable:hover { border-color: var(--primary-deep); background: var(--primary-tint-strong); }
 .status-card--clickable:active { transform: scale(0.97); }
 .status-card--clickable .status-card__sub { color: var(--primary); font-weight: 600; }
 
@@ -58,7 +58,7 @@
 }
 
 .status-card--success .status-card__value { color: var(--success); }
-.status-card--warning .status-card__value { color: #B87A17; }
-.status-card--warning .status-card__sub { color: #B87A17; }
+.status-card--warning .status-card__value { color: var(--warning-tint-ink); }
+.status-card--warning .status-card__sub { color: var(--warning-tint-ink); }
 .status-card--danger .status-card__value { color: var(--danger); }
 .status-card--neutral .status-card__value { color: var(--ink); }

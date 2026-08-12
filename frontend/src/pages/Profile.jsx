@@ -3,8 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { getCurrentWeather } from "../weather";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import { pushSupported, getPushSubscriptionStatus, subscribeToPush, unsubscribeFromPush, getPushUnavailableReason } from "../push";
-import { MapPin } from "lucide-react";
+import { MapPin, Sun, Moon, MonitorSmartphone } from "lucide-react";
+
+const THEME_OPTIONS = [
+  { id: "light", label: "Claro", icon: Sun },
+  { id: "dark", label: "Oscuro", icon: Moon },
+  { id: "system", label: "Sistema", icon: MonitorSmartphone },
+];
 
 const ACTIVITY_LEVEL_LABELS = {
   sedentario: "Sedentario",
@@ -14,6 +21,7 @@ const ACTIVITY_LEVEL_LABELS = {
 
 export default function Profile() {
   const { user, logout } = useAuth();
+  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState(null);
@@ -250,6 +258,24 @@ export default function Profile() {
           {saving ? "Guardando..." : "Guardar cambios"}
         </button>
       </form>
+
+      <div className="card setup-form">
+        <h2 style={{ fontSize: 16 }}>Apariencia</h2>
+        <div className="theme-toggle" role="group" aria-label="Tema de la app">
+          {THEME_OPTIONS.map((opt) => (
+            <button
+              key={opt.id}
+              type="button"
+              className={`theme-toggle__btn ${theme === opt.id ? "theme-toggle__btn--active" : ""}`}
+              onClick={() => setTheme(opt.id)}
+              aria-pressed={theme === opt.id}
+            >
+              <opt.icon size={16} />
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="card setup-form">
         <h2 style={{ fontSize: 16 }}>Tus recipientes calibrados</h2>

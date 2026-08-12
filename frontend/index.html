@@ -8,6 +8,20 @@
     <meta name="theme-color" content="#0E7C86" />
     <meta name="description" content="Seguimiento de hidratación personalizado con recordatorios inteligentes" />
     <title>HydrApp</title>
+    <script>
+      // Aplica el tema antes del primer render de React para evitar el
+      // flash de tema incorrecto (FOUC) al cargar. Debe quedar en sync con
+      // la lógica de context/ThemeContext.jsx.
+      (function () {
+        try {
+          var stored = localStorage.getItem("hydrapp_theme") || "system";
+          var isDark = stored === "dark" || (stored === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+        } catch (e) {
+          // localStorage puede fallar en modo privado estricto; no rompe nada, queda claro.
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

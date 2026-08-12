@@ -75,18 +75,18 @@
 }
 
 .history-cal__cell--success {
-  background: #E4F8ED;
-  color: #1E8A50;
+  background: var(--success-tint);
+  color: var(--success-tint-ink);
 }
 
 .history-cal__cell--warning {
-  background: #FDF3DC;
-  color: #B87A17;
+  background: var(--warning-tint);
+  color: var(--warning-tint-ink);
 }
 
 .history-cal__cell--danger {
-  background: #FFEBEB;
-  color: #C13F3F;
+  background: var(--danger-tint);
+  color: var(--danger-tint-ink);
 }
 
 .history-cal__cell--future {

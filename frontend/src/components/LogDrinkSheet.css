@@ -18,7 +18,7 @@
   color: var(--ink);
   transition: transform 0.1s ease, background 0.15s ease;
 }
-.drink-option:hover { background: #E3EBFB; }
+.drink-option:hover { background: var(--primary-tint-strong); }
 .drink-option:active { transform: scale(0.96); }
 .drink-option__icon { display: flex; color: var(--primary); }
 
@@ -63,8 +63,8 @@
 }
 
 .container-quick-option {
-  background: #EAF2FF;
-  border: 1.5px solid #CFE0FB;
+  background: var(--primary-tint);
+  border: 1.5px solid var(--primary-tint-border);
   border-radius: var(--radius-md);
   padding: 12px 14px;
   display: flex;
@@ -73,7 +73,7 @@
   text-align: left;
   transition: transform 0.1s ease, background 0.15s ease;
 }
-.container-quick-option:hover { background: #DCE9FF; }
+.container-quick-option:hover { background: var(--primary-tint-strong); }
 .container-quick-option:active { transform: scale(0.96); }
 .container-quick-option__name { font-weight: 700; font-size: 14px; color: var(--ink); }
 .container-quick-option__vol { font-size: 12px; color: var(--primary-deep); font-weight: 600; }
@@ -93,7 +93,7 @@
   color: var(--primary-deep);
   transition: transform 0.1s ease, background 0.15s ease;
 }
-.amount-option:hover { background: #E3EBFB; }
+.amount-option:hover { background: var(--primary-tint-strong); }
 .amount-option:active { transform: scale(0.96); }
 
 .amount-custom-wrap {

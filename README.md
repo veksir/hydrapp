@@ -103,10 +103,32 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 
 **Pendiente de esta pasada de diseño:**
 - Onboarding paso a paso (el flujo actual sigue siendo un formulario en 2 pasos).
-- Modo oscuro.
 - Skeletons/shimmer en estados de carga (hoy son mensajes de texto planos).
 - Transiciones entre pantallas.
 - Contraste de verdes ajustado a WCAG AA.
+
+**Modo oscuro (hecho):**
+Toggle Claro/Oscuro/Sistema en Perfil → "Apariencia". Persistido en
+`localStorage` (`hydrapp_theme`), aplicado antes del primer render (script
+inline en `index.html`) para evitar flash de tema incorrecto. En modo
+"Sistema" sigue en vivo los cambios de `prefers-color-scheme` del SO.
+- Toda la paleta ya vivía en variables CSS (`index.css`); se agregó un
+bloque `:root[data-theme="dark"]` con los mismos nombres de variable
+(fondos, superficies, texto, y variantes "tint" nuevas para
+success/warning/danger/primary usadas en pills, celdas de calendario,
+hovers, etc.).
+- Se reemplazaron todos los colores hex sueltos que había fuera de
+`index.css` (~20, repartidos en `CenterAlert.css`, `EducationCapsule.css`,
+`HistoryCalendar.css`, `LogDrinkSheet.css`, `StatusCards.css`,
+`TodayLogs.css`, `layout.css`) por las variables semánticas nuevas — así
+ningún componente queda "roto" (mostrando colores claros fijos) al
+cambiar a oscuro.
+- Colores de marca (primary/secondary/success/warning/danger) se
+mantienen reconocibles en ambos modos, solo se ajustó su tono para
+contraste sobre fondo oscuro.
+- Verificado en navegador (12-ago): toggle instántaneo, "Sistema" en vivo
+siguiendo al SO, sin flash de tema al cargar, y contraste correcto en las
+pantallas principales. `npm run build` limpio y `oxlint` sin warnings.
 
 **Historial en vista calendario (hecho):**
 `/historial` tiene ahora un toggle Calendario/Lista (Calendario por

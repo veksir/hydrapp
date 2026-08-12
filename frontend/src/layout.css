@@ -25,7 +25,7 @@
   justify-content: flex-end;
   padding: 32px 20px;
   gap: 28px;
-  background: radial-gradient(120% 60% at 50% 0%, #E5F0FF 0%, var(--bg) 60%);
+  background: radial-gradient(120% 60% at 50% 0%, var(--auth-hero-gradient) 0%, var(--bg) 60%);
 }
 
 .auth-hero {
@@ -181,7 +181,7 @@
   font-size: 12px;
   font-weight: 600;
   color: var(--success);
-  background: #E4F8ED;
+  background: var(--success-tint);
   padding: 4px 10px;
   border-radius: 999px;
 }
@@ -410,9 +410,38 @@
   padding: 6px 14px;
   border-radius: 999px;
 }
-.status-pill--ok { background: #E4F8ED; color: var(--success); }
-.status-pill--warn { background: #FDF3DC; color: #B87A17; }
-.status-pill--alert { background: #FFEBEB; color: var(--danger); }
+.status-pill--ok { background: var(--success-tint); color: var(--success); }
+.status-pill--warn { background: var(--warning-tint); color: var(--warning-tint-ink); }
+.status-pill--alert { background: var(--danger-tint); color: var(--danger); }
+
+/* ---------- Theme toggle (Perfil > Apariencia) ---------- */
+.theme-toggle {
+  display: flex;
+  gap: 8px;
+  background: var(--surface-sunk);
+  padding: 4px;
+  border-radius: var(--radius-md);
+}
+.theme-toggle__btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 10px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.theme-toggle__btn--active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+}
 
 /* ---------- History ---------- */
 .history {
@@ -492,8 +521,8 @@
 }
 
 .pending-sync-banner {
-  background: #FEF3DC;
-  color: #7A5A0E;
+  background: var(--warning-tint);
+  color: var(--warning-tint-ink);
   font-size: 12px;
   font-weight: 600;
   padding: 10px 14px;

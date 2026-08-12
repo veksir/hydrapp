@@ -1,5 +1,5 @@
 .education-capsule {
-  background: linear-gradient(135deg, #EAF2FF, #E5FBFB);
+  background: linear-gradient(135deg, var(--capsule-gradient-start), var(--capsule-gradient-end));
   border-radius: var(--radius-md);
   padding: 16px 18px;
   display: flex;
@@ -23,7 +23,7 @@
   gap: 4px;
 }
 .education-capsule__nav button {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--capsule-nav-bg);
   width: 24px;
   height: 24px;
   border-radius: 50%;

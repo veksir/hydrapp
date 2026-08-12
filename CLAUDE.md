@@ -83,6 +83,42 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
 
 ## Features cerrados
 
+### Modo oscuro
+- **Archivos nuevos:** `frontend/src/context/ThemeContext.jsx` (Provider +
+  hook `useTheme`, mismo patrón que `AuthContext.jsx`).
+- **Archivos modificados:** `frontend/index.html` (script inline que aplica
+  `data-theme` antes del primer render, evita flash de tema incorrecto),
+  `frontend/src/main.jsx` (envuelve con `ThemeProvider`), `frontend/src/index.css`
+  (bloque `:root[data-theme="dark"]` + variables "tint" nuevas para
+  success/warning/danger/primary), `frontend/src/pages/Profile.jsx`
+  (toggle Claro/Oscuro/Sistema, tarjeta "Apariencia"),
+  `frontend/src/layout.css` (estilos del toggle) y todos los `.css` de
+  componentes que tenían color hex hardcodeado en vez de variable
+  (`CenterAlert.css`, `EducationCapsule.css`, `HistoryCalendar.css`,
+  `LogDrinkSheet.css`, `StatusCards.css`, `TodayLogs.css`).
+- **Qué hace:** tres opciones (Claro/Oscuro/Sistema), persistidas en
+  `localStorage` (`hydrapp_theme`). En "Sistema" sigue en vivo
+  `prefers-color-scheme` vía `matchMedia` con listener de `change`, no
+  solo al cargar.
+- **Decisión de implementación:** la paleta ya vivía centralizada en
+  variables CSS en `index.css`, así que el modo oscuro se resolvió
+  sobreescribiendo esas mismas variables bajo `[data-theme="dark"]`, sin
+  tocar la lógica de ningún componente. El trabajo real fue encontrar y
+  migrar ~20 colores hex sueltos (fondos "tint" de success/warning/danger,
+  hovers de azul) que estaban hardcodeados fuera de `index.css` — esos sí
+  quedaban rotos (colores claros fijos) si no se migraban a variable.
+- **Backend:** sin cambios.
+- **Verificado:** `npm run build` limpio; `oxlint` sin warnings nuevos
+  (los 2 de `Profile.jsx` ya existían en main, y el de `ThemeContext.jsx`
+  sigue el mismo patrón aceptado que `AuthContext.jsx`). Prueba manual de
+  Kevin (12-ago) completa: toggle Claro/Oscuro/Sistema instántaneo,
+  "Sistema" siguiendo al SO en vivo sin recargar, sin flash de tema claro
+  al cargar en frío con oscuro activo, contraste de los "tint" correcto
+  en HistoryCalendar/StatusCards, y revisión de todas las pantallas
+  (Dashboard, Historial, Perfil, Insights, Login/Register).
+- **Estado:** commit `feat: modo oscuro` en branch `feat/dark-mode`,
+  sin mergear a main todavía (el merge lo hace Kevin tras validar).
+
 ### Historial en vista calendario
 - **Archivos nuevos:** `frontend/src/components/HistoryCalendar.jsx` (+`.css`),
   `frontend/src/components/HistoryChart.jsx` (+`.css`).

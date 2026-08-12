@@ -29,7 +29,7 @@
 .today-logs__item:last-child { border-bottom: none; }
 
 .today-logs__item--new {
-  background-color: #E4F8ED;
+  background-color: var(--success-tint);
   border-radius: var(--radius-sm);
 }
 
