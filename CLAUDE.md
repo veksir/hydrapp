@@ -96,16 +96,17 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
 - **Backend:** sin cambios — `GET /api/logs/history` ya soportaba hasta 90
   días; el frontend simplemente pide 90 en vez de 14 para el calendario.
 - **Verificado:** `npm run build` limpio, `oxlint` sin warnings sobre los
-  archivos nuevos/tocados. **No se probó manualmente en navegador/mobile**
-  (sin backend corriendo en este entorno) — falta que Kevin lo pruebe con
-  datos reales antes de mergear, especialmente: navegación de meses en el
-  límite de los 90 días, y el conteo de semanas cuando el mes empieza en
-  domingo.
+  archivos nuevos/tocados. Prueba manual de Kevin (12-ago) completa:
+  zona horaria (borde "hoy" de noche), límite de 90 días (deshabilitado
+  correcto de los botones atrás/adelante), alineación del grid en meses
+  que empiezan en días distintos, detalle del día con datos reales,
+  toggle Calendario/Lista, y gráfica de tendencia (segmentos cortados en
+  huecos, tooltip correcto).
 - **Fix de sesión (12-ago):** `HistoryCalendar.jsx` marcaba "hoy" con
   `today.toISOString().slice(0,10)` (fecha UTC). Entre las 19:00 y 23:59
   en Colombia (UTC-5) resaltaba la celda del día SIGUIENTE. Se cambió a
   construir la fecha local (`getFullYear/getMonth/getDate`).
-- **Branch:** `feat/history-calendar-view` (sin mergear a main todavía).
+- **Estado:** merged a main vía fast-forward en `6e6a714` — 2026-08-12.
 
 ## Convenciones del repo (ya decididas, no re-discutir)
 
