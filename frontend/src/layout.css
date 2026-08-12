@@ -420,6 +420,32 @@
   flex-direction: column;
   gap: 18px;
 }
+.history__toggle {
+  display: flex;
+  gap: 8px;
+  background: var(--surface-sunk);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  width: fit-content;
+}
+.history__toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.history__toggle-btn--active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+}
 .history__chart {
   padding: 20px;
   display: flex;

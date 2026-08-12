@@ -103,12 +103,27 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 
 **Pendiente de esta pasada de diseño:**
 - Onboarding paso a paso (el flujo actual sigue siendo un formulario en 2 pasos).
-- Historial en vista calendario (hoy es una lista de barras).
 - Modo oscuro.
 - Skeletons/shimmer en estados de carga (hoy son mensajes de texto planos).
-- Gráficas/sparklines reales en Historial e Insights.
 - Transiciones entre pantallas.
 - Contraste de verdes ajustado a WCAG AA.
+
+**Historial en vista calendario (hecho):**
+`/historial` tiene ahora un toggle Calendario/Lista (Calendario por
+defecto). La lista original (barras de los últimos 14 días) se conserva.
+- Calendario: grid mensual tipo heatmap (`frontend/src/components/HistoryCalendar.jsx`),
+coloreado por % de meta cumplida (verde ≥80%, amarillo 40-79%, rojo <40%,
+gris sin dato). Navegación mes a mes limitada al rango de datos
+disponible. Tocar un día abre el detalle en un `BottomSheet` existente.
+- Gráfica de tendencia (`frontend/src/components/HistoryChart.jsx`,
+últimos 30 días): SVG puro escrito a mano, sin librería de gráficas —
+decisión consciente para no sumar una dependencia nueva solo para una
+línea con puntos. Si más adelante se necesitan gráficas más complejas
+(barras apiladas, varias series), ahí sí conviene reconsiderar y meter
+una librería (recharts, chart.js).
+- `GET /api/logs/history` no cambió (ya soportaba hasta 90 días); el
+frontend ahora pide 90 para poder navegar meses atrás en el calendario,
+y sigue pidiendo 14 para la vista de lista.
 
 ## 3. Frontend
 

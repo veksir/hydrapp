@@ -81,6 +81,32 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   siempre mensaje controlado; respuesta válida resuelve correctamente.
 - **Commit:** `6db65b8` — 2026-08-11 (branch `fix/delete-race-and-weather-nulls`, mergeada a main).
 
+## Features cerrados
+
+### Historial en vista calendario
+- **Archivos nuevos:** `frontend/src/components/HistoryCalendar.jsx` (+`.css`),
+  `frontend/src/components/HistoryChart.jsx` (+`.css`).
+- **Archivos modificados:** `frontend/src/pages/History.jsx` (toggle
+  Calendario/Lista), `frontend/src/layout.css` (estilos del toggle).
+- **Qué hace:** grid mensual tipo heatmap coloreado por % de meta cumplida
+  por día, con detalle al tocar un día (reutiliza `BottomSheet`), más una
+  gráfica de tendencia de los últimos 30 días. Ambos en SVG/CSS puro, sin
+  librería de gráficas nueva (decisión consciente, documentada en el README
+  sección de Historial).
+- **Backend:** sin cambios — `GET /api/logs/history` ya soportaba hasta 90
+  días; el frontend simplemente pide 90 en vez de 14 para el calendario.
+- **Verificado:** `npm run build` limpio, `oxlint` sin warnings sobre los
+  archivos nuevos/tocados. **No se probó manualmente en navegador/mobile**
+  (sin backend corriendo en este entorno) — falta que Kevin lo pruebe con
+  datos reales antes de mergear, especialmente: navegación de meses en el
+  límite de los 90 días, y el conteo de semanas cuando el mes empieza en
+  domingo.
+- **Fix de sesión (12-ago):** `HistoryCalendar.jsx` marcaba "hoy" con
+  `today.toISOString().slice(0,10)` (fecha UTC). Entre las 19:00 y 23:59
+  en Colombia (UTC-5) resaltaba la celda del día SIGUIENTE. Se cambió a
+  construir la fecha local (`getFullYear/getMonth/getDate`).
+- **Branch:** `feat/history-calendar-view` (sin mergear a main todavía).
+
 ## Convenciones del repo (ya decididas, no re-discutir)
 
 - Sin GitHub Actions ni widgets de mantenimiento pesado en el README/perfil.
