@@ -116,8 +116,8 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   al cargar en frío con oscuro activo, contraste de los "tint" correcto
   en HistoryCalendar/StatusCards, y revisión de todas las pantallas
   (Dashboard, Historial, Perfil, Insights, Login/Register).
-- **Estado:** commit `feat: modo oscuro` en branch `feat/dark-mode`,
-  sin mergear a main todavía (el merge lo hace Kevin tras validar).
+- **Estado:** merged a main vía fast-forward en `2465b41`(dark-mode) — el
+  merge lo hace Kevin tras validar.
 
 ### Historial en vista calendario
 - **Archivos nuevos:** `frontend/src/components/HistoryCalendar.jsx` (+`.css`),
