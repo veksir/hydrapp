@@ -22,6 +22,7 @@ async function checkAndNotifyUser(userId) {
   }
 
   if (status.is_past_bedtime) return;
+  if (status.goal_met) return;
   if (!status.thirst_prediction?.likely) return;
 
   const sub = db.prepare("SELECT last_notified_at FROM push_subscriptions WHERE user_id = ? ORDER BY last_notified_at DESC LIMIT 1").get(userId);

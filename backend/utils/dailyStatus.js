@@ -125,6 +125,10 @@ function getTodayGoalAndStatus(userId, profile) {
     hydrationStatus.message = "Ya cumpliste tu meta de hoy. Si sientes sed real, sigue tomando con moderación.";
   }
   hydrationStatus.thirst_prediction = thirstPrediction;
+  // Expuesto explícitamente (no solo inferible del texto de message) para
+  // que consumidores como pushScheduler puedan decidir si vale la pena
+  // notificar sin tener que re-derivar esta cuenta ellos mismos.
+  hydrationStatus.goal_met = alreadyMetGoal;
 
   return { date, context, activityMinutes, tempC, humidityPct, goal, todayLogs, consumedMl, hydrationStatus };
 }
