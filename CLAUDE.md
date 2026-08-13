@@ -190,6 +190,39 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   construir la fecha local (`getFullYear/getMonth/getDate`).
 - **Estado:** merged a main vía fast-forward en `6e6a714` — 2026-08-12.
 
+### Recipientes de gran capacidad con tomas parciales
+- **Qué hace:** un recipiente marcado como termo/jarra/botellón
+  (`container_type` ≠ `custom`) o con volumen >3000ml ya no registra toda
+  su capacidad de una sola vez: abre una tarjeta (`LargeContainerCard`) con
+  nivel de líquido restante, toma parcial (decanta del `current_volume`) y
+  rellenado manual. Cada recipiente tiene su propio contenido (`drink_type`
+  con factor de hidratación) que manda sobre la selección global del sheet.
+- **Backend:** columna `drink_type` en `containers` (+migración ALTER en
+  `backend/db/init.js`); `PUT /api/containers/:id` para editar (al cambiar
+  volumen **escala `current_volume` proporcionalmente** si el recipiente se
+  reseteó hoy); `POST /:id/sip` usa el `drink_type` del recipiente con
+  fallback a body y luego "agua". El registro de logs se extrajo a
+  `backend/utils/createWaterLog.js` (compartido por `logs.js` y el sip),
+  manteniendo meta, factor de hidratación y detector de ráfagas intactos.
+- **Frontend:** `ContainerForm.jsx` (tipo + contenido siempre visibles, modo
+  edición), `Profile` con botones Editar/Eliminar y tag "toma parcial",
+  `LogDrinkSheet` con pasos 1/2/3 y acceso directo a recipientes en el paso
+  1, `LargeContainerCard` con confirmación **dentro de los botones** (no
+  desplaza el layout), `Dashboard` con `handleSip`/`handleRefill` inline.
+- **Extras transversales del branch:** `ConfirmDialog` propio reemplaza al
+  `window.confirm` del navegador al eliminar registros; `BottomSheet` ganó
+  botón de cierre "×" (visible en todos los pasos, no dependía solo del
+  backdrop, que en celular con muchos recipientes cubría toda la pantalla).
+- **Backend verificado:** PUT 1500→2000 con restante 1000 → 1333; sip sin
+  drink en body usa el del recipiente; PUT inválido → 400; sip > restante →
+  400. **Frontend:** `npm run build` limpio, `oxlint` sin warnings nuevos
+  (10 pre-existentes). Prueba manual de Kevin: pendiente de sesión final en
+  celular (layout del Perfil y sheet con >2 recipientes).
+- **Estado:** en branch `feat/recipientes-gran-capacidad` (5 commits,
+  sin mergear a main): `f48bbf7` (backend), `c26600b` (edición frontend),
+  `68fe55c` (styles), `2279a8a` (tomas parciales sheet), `2c0de99`
+  (ConfirmDialog + cierre sheet) — 2026-08-13.
+
 ## Pendiente
 
 Consolidado desde el README (que tenía ítems ya cerrados mezclados con
