@@ -48,6 +48,15 @@ router.post("/unsubscribe", (req, res) => {
   res.status(204).send();
 });
 
+// Lista los endpoints que el servidor conoce del usuario. El frontend la usa
+// para no mostrar "activado" cuando el navegador conserva una suscripción
+// que el backend perdió (p.ej. tras reiniciar la base): sin esto el toggle
+// queda en ON pero el push nunca llega.
+router.get("/subscriptions", (req, res) => {
+  const subs = db.prepare("SELECT endpoint FROM push_subscriptions WHERE user_id = ?").all(req.userId);
+  res.json({ endpoints: subs.map((s) => s.endpoint) });
+});
+
 // Botón "enviarme una de prueba" para que el usuario confirme que sí llegan.
 router.post("/test", async (req, res) => {
   if (!pushEnabled) {

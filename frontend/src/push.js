@@ -44,7 +44,19 @@ export async function getPushSubscriptionStatus() {
   if (!pushSupported()) return false;
   const reg = await navigator.serviceWorker.ready;
   const sub = await reg.pushManager.getSubscription();
-  return Boolean(sub);
+  if (!sub) return false;
+
+  // El toggle solo cuenta como "activado" si el servidor también conoce la
+  // suscripción. Si la base del backend se reinició o el endpoint se perdió,
+  // el navegador puede conservar una suscripción "muerta": el push no
+  // llegaría aunque la UI dijera que está activado. En ese caso se muestra
+  // desactivado para que el usuario re-active (y re-persista) sin fricción.
+  try {
+    const { endpoints } = await api.getPushSubscriptions();
+    return endpoints.includes(sub.endpoint);
+  } catch {
+    return false;
+  }
 }
 
 export async function subscribeToPush() {
@@ -68,10 +80,15 @@ export async function subscribeToPush() {
   }
 
   const reg = await navigator.serviceWorker.ready;
-  const subscription = await reg.pushManager.subscribe({
+  // Si el navegador ya tiene una suscripción (p.ej. el backend perdió la
+  // guardada al reiniciar la base), no se crea otra: re-persistir la que ya
+  // existe. Llamar a subscribe() con un applicationServerKey distinto al de
+  // la suscripción actual lanzaría InvalidStateError en algunos navegadores.
+  const existing = await reg.pushManager.getSubscription();
+  const subscription = existing || (await reg.pushManager.subscribe({
     userVisibleOnly: true,
     applicationServerKey: urlBase64ToUint8Array(publicKey),
-  });
+  }));
 
   await api.pushSubscribe(subscription.toJSON());
   return subscription;

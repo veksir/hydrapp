@@ -78,6 +78,7 @@ export const api = {
   checkSymptoms: (symptom_ids) => request("/symptoms/check", { method: "POST", body: { symptom_ids } }),
 
   getPushPublicKey: () => request("/push/vapid-public-key"),
+  getPushSubscriptions: () => request("/push/subscriptions"),
   pushSubscribe: (subscription) => request("/push/subscribe", { method: "POST", body: subscription }),
   pushUnsubscribe: (payload) => request("/push/unsubscribe", { method: "POST", body: payload }),
   pushTest: () => request("/push/test", { method: "POST" }),

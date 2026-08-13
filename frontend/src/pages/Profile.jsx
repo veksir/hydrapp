@@ -97,8 +97,12 @@ export default function Profile() {
   async function handleTestPush() {
     setPushMessage("");
     try {
-      await api.pushTest();
-      setPushMessage("Notificación de prueba enviada — revisa tu dispositivo.");
+      const result = await api.pushTest();
+      if (result?.sent === 0) {
+        setPushMessage("No se pudo enviar: tu suscripción ya no está activa en el servidor. Desactívala y vuelve a activarla.");
+      } else {
+        setPushMessage("Notificación de prueba enviada — revisa tu dispositivo.");
+      }
     } catch (err) {
       setPushMessage(err.message);
     }
