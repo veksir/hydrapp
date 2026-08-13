@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import "./HistoryChart.css";
 
 const WIDTH = 320;
@@ -10,7 +10,11 @@ const PAD_BOTTOM = 22;
 // Gráfica de línea simple en SVG puro (sin librerías) que muestra el % de
 // meta cumplida por día. Solo se dibujan los días CON registro; los días
 // "sin dato" se marcan aparte y no interpolan la línea sobre ellos.
+// Interacción: pointer events resuelven el día por la coordenada X (no por
+// un punto de ~5px), con guía vertical y scrub — un dedo de ~48px mapea
+// siempre al día más cercano y deslizando se recorre el detalle día a día.
 export default function HistoryChart({ rows }) {
+  const svgRef = useRef(null);
   const [hover, setHover] = useState(null);
 
   const { points, goalY } = useMemo(() => {
@@ -31,10 +35,6 @@ export default function HistoryChart({ rows }) {
 
   if (points.length < 2) return null;
 
-  // Área táctil de una columna completa por día: el punto visual mide ~5px y
-  // era casi imposible de tocar; ahora toda la columna del día captura el toque.
-  const step = (WIDTH - PAD_X * 2) / (points.length - 1);
-
   // Construye el path solo entre puntos consecutivos que SÍ tienen dato,
   // para no dibujar una línea falsa cruzando los días sin registro.
   const segments = [];
@@ -51,27 +51,46 @@ export default function HistoryChart({ rows }) {
 
   const activePoint = hover !== null ? points[hover] : null;
 
+  function resolveHover(e) {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * WIDTH;
+    let best = -1;
+    let bestDist = Infinity;
+    for (let i = 0; i < points.length; i++) {
+      if (points[i].y === null) continue;
+      const d = Math.abs(points[i].x - x);
+      if (d < bestDist) {
+        bestDist = d;
+        best = i;
+      }
+    }
+    if (best !== -1) setHover(best);
+  }
+
   return (
     <div className="history-chart card">
       <p className="history-chart__title">Tendencia (% de meta por día)</p>
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         className="history-chart__svg"
-        onMouseLeave={() => setHover(null)}
+        onPointerDown={(e) => {
+          if (e.pointerType === "touch") e.currentTarget.setPointerCapture(e.pointerId);
+          resolveHover(e);
+        }}
+        onPointerMove={resolveHover}
+        onPointerLeave={() => setHover(null)}
       >
-        {points.map((p, i) =>
-          p.y !== null ? (
-            <rect
-              key={`hit-${i}`}
-              className="history-chart__hit"
-              x={p.x - step / 2}
-              y={PAD_TOP}
-              width={step}
-              height={HEIGHT - PAD_TOP - PAD_BOTTOM}
-              onMouseEnter={() => setHover(i)}
-              onTouchStart={() => setHover(i)}
-            />
-          ) : null
+        {activePoint && (
+          <line
+            x1={activePoint.x}
+            y1={PAD_TOP}
+            x2={activePoint.x}
+            y2={HEIGHT - PAD_BOTTOM}
+            className="history-chart__guide"
+          />
         )}
         <line x1={PAD_X} y1={goalY} x2={WIDTH - PAD_X} y2={goalY} className="history-chart__goal-line" />
 
@@ -89,10 +108,8 @@ export default function HistoryChart({ rows }) {
               key={i}
               cx={p.x}
               cy={p.y}
-              r={hover === i ? 4.5 : 2.5}
+              r={hover === i ? 6 : 2.5}
               className={`history-chart__dot ${p.pct >= 100 ? "history-chart__dot--good" : ""}`}
-              onMouseEnter={() => setHover(i)}
-              onTouchStart={() => setHover(i)}
             />
           ) : (
             <circle key={i} cx={p.x} cy={HEIGHT - PAD_BOTTOM + 8} r={2} className="history-chart__dot--empty" />
@@ -107,7 +124,7 @@ export default function HistoryChart({ rows }) {
           <strong>{activePoint.pct}%</strong> ({activePoint.consumed_ml} ml)
         </p>
       ) : (
-        <p className="history-chart__tooltip history-chart__tooltip--hint">Toca un punto para ver el detalle</p>
+        <p className="history-chart__tooltip history-chart__tooltip--hint">Toca o desliza sobre la gráfica para ver el detalle</p>
       )}
     </div>
   );

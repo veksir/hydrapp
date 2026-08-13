@@ -15,17 +15,20 @@
   width: 100%;
   height: 140px;
   overflow: visible;
+  touch-action: none;
+}
+
+.history-chart__guide {
+  stroke: var(--ink-soft);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.6;
 }
 
 .history-chart__goal-line {
   stroke: var(--border);
   stroke-width: 1;
   stroke-dasharray: 4 4;
-}
-
-.history-chart__hit {
-  fill: transparent;
-  cursor: pointer;
 }
 
 .history-chart__line {

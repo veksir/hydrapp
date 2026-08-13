@@ -204,7 +204,7 @@ Bugs encontrados usando la app, no solo leyendo código:
 - **Despertar antes de la hora configurada generaba una "deuda" falsa**: efecto secundario del arreglo de la vuelta anterior (la recalibración por inicio tardío se disparaba también al despertar temprano). Corregido: ahora solo recalibra cuando efectivamente se despierta después de la hora configurada; si es antes, el día simplemente "no ha empezado" según el perfil, sin deuda. Validado en tres casos por separado (madrugador, horario normal, trasnochador). Ver `backend/utils/dailyStatus.js` y `backend/utils/predictor.js`.
 
 **Cuarta vuelta (auditoría de UX, 12-ago)**
-- **Tocar un punto de la gráfica de tendencia del Historial era casi imposible en el celular**: el punto visual mide ~5px y el tooltip solo se activaba tocando EXACTAMENTE ese punto. Ahora cada día con registro tiene un área táctil de columna entera superpuesta (`HistoryChart.jsx`), así cualquier toque en la franja vertical de ese día abre el detalle; el dibujo y el hover del punto en desktop no cambiaron. Ver `AUDITORIA-UX.md` (ítem 16).
+- **Tocar un punto de la gráfica de tendencia del Historial era casi imposible en el celular**: el punto visual mide ~5px y el tooltip solo se activaba tocando EXACTAMENTE ese punto. Ahora la gráfica usa pointer events que resuelven el día por la **coordenada X** del toque (un dedo de ~48px siempre cae en el día más cercano), con guía vertical en el día activo y **scrub**: manteniendo y deslizando el dedo se recorre el detalle día a día. El dibujo y el hover del mouse en desktop no cambiaron. Ver `AUDITORIA-UX.md` (ítem 16).
 
 ## 8. Qué sigue (v2)
 

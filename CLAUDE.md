@@ -88,12 +88,15 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   tooltip solo se activaba con `onMouseEnter`/`onTouchStart` exactamente sobre
   ese punto. El dedo cubre varios días y el target era diminuto: el hint
   "Toca un punto para ver el detalle" fallaba en casi todos los toques en móvil.
-- **Fix aplicado:** se implementó la opción de "columna entera" que proponía la
-  auditoría. Cada día con registro tiene un `rect` transparente que cubre toda
-  la altura del gráfico y el ancho de su columna (`HistoryChart.jsx`), así
-  cualquier toque dentro de esa franja vertical activa el tooltip del día. La
-  línea y los puntos quedan por encima del rect, así que el hover preciso del
-  punto se conserva en desktop. El dibujo visual no cambió (punto de 2.5px).
+- **Fix aplicado:** se reemplazó el tap-sobre-punto por pointer events con
+  resolución del día por **coordenada X** (un dedo de ~48px siempre cae en el
+  día más cercano aunque la columna mida solo ~10px con 30 días en la gráfica),
+  **guía vertical** + punto agrandado en el día activo (feedback visual de qué
+  día quedó seleccionado) y **scrub**: mantener y deslizar el dedo recorre el
+  detalle día a día en vivo. `touch-action: none` en el SVG evita que el
+  scroll de la página robe el gesto. El dibujo visual no cambió (punto de
+  2.5px, 6px al activo) y el hover del mouse se conserva vía los mismos
+  pointer events.
 - **Commit:** pendiente de merge (branch `fix/trend-touch-target`).
 
 ## Features cerrados
