@@ -417,6 +417,7 @@
 /* ---------- Theme toggle (Perfil > Apariencia) ---------- */
 .theme-toggle {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   background: var(--surface-sunk);
   padding: 4px;
