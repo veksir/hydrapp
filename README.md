@@ -37,6 +37,7 @@ Por defecto queda escuchando en `http://localhost:4000`. La base de datos es un 
 | GET | `/api/logs/history?days=14` | Historial agregado por día |
 | GET | `/api/symptoms/catalog` | Lista de síntomas para el chequeo |
 | POST | `/api/symptoms/check` | Evalúa síntomas reportados vs ritmo de consumo de hoy |
+| GET | `/api/push/subscriptions` | Endpoints de push guardados del usuario (el frontend lo usa para no mostrar "activado" si el backend perdió la suscripción) |
 
 Todas menos `register`/`login` requieren header `Authorization: Bearer <token>`.
 
@@ -212,6 +213,13 @@ Bugs encontrados usando la app, no solo leyendo código:
 **Quinta vuelta (13-ago, feature de recipientes con toma parcial)**
 - **El borrado de registros usaba el `window.confirm` del navegador**: rompía el estilo y el idioma del producto. Reemplazado por `ConfirmDialog`, un diálogo propio con botón de acción en rojo, que además respeta el guard anti doble-tap del borrado animado.
 - **Sin forma de cerrar el sheet del "+" cuando cubría toda la pantalla**: con varios recipientes de toma parcial, el sheet ocupaba el 85vh y el backdrop (lo único tocable para cerrar) quedaba fuera de la vista — en celular no había escape salvo el botón atrás del sistema. `BottomSheet` ahora tiene botón de cierre "×" fijo en la esquina superior, visible en todos los pasos. Aplica también al sheet de actividad y al detalle del calendario.
+
+**Sexta vuelta (13-ago, prueba de la demo)**
+- **El botón "Registrar" estiraba el paso 2 del sheet por la derecha y la vista quedaba "corrida"**: la fila input + botón podía desbordar el ancho del sheet, y el scroll del paso 1 se conservaba al pasar al paso 2 (renderizaba a la altura del scroll anterior). El input ahora tiene `min-width: 0`, el botón `flex-shrink: 0` + `white-space: nowrap`, y el sheet se recoloca arriba al abrir/cambiar de paso. Ver `LogDrinkSheet.css`/`LogDrinkSheet.jsx`/`BottomSheet.jsx`.
+- **El clima del onboarding decía "Clima detectado ✓ (volver a detectar)"**: ese "(volver a detectar)" se leía como que faltaba rehacerlo. Ahora dice "Clima detectado con tu ubicación ✓". Ver `Setup.jsx`.
+- **Texto raro del onboarding**: el hint del sexo ("piso de referencia científico") y el del paso 2 ("no usamos vasos 'estándar' predefinidos") se reescribieron — el segundo además chocaba con el nuevo tipo "Recipiente normal". Ver `Setup.jsx`.
+- **Notificaciones que aparecían "activadas" sin llegar nunca**: el toggle se basaba solo en la suscripción del navegador; si el backend perdía la guardada (base reiniciada), la UI mostraba activadas y "Enviarme una de prueba" no llegaba (0 suscripciones server-side). Ahora el estado exige que el endpoint también exista en el backend (`GET /api/push/subscriptions`), al reactivar se re-persiste la suscripción existente en vez de crear otra, y la prueba avisa honestamente cuando `sent: 0`. Ver `push.js` frontend, `routes/push.js` backend.
+- **"Otro (vaso normal)" como primera opción de tipo de recipiente confundía**: ahora se llama "Recipiente normal". Ver `ContainerForm.jsx`.
 
 ## 8. Qué sigue (v2)
 

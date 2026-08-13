@@ -128,6 +128,30 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   Dashboard/Historial/Perfil en claro y oscuro.
 - **Commit:** pendiente (branch `fix/wcag-contraste-verde`).
 
+### 6. Botón "Registrar" estiraba la sección hacia la derecha en el sheet (y la vista quedaba "corrida")
+- **Archivos:** `frontend/src/components/LogDrinkSheet.css`, `LogDrinkSheet.jsx`, `BottomSheet.jsx`.
+- **Problema:** en el paso 2 del sheet de bebida, la fila `input + Registrar` podía desbordar el ancho del sheet hacia la derecha (el input flex no tenía `min-width: 0`, y el botón podía comprimirse). Además, al cambiar de paso el scroll del sheet se conservaba: si el paso 1 era largo (muchos recipientes) y el usuario estaba abajo, el paso 2 renderizaba "corrido" a la altura del scroll anterior.
+- **Fix aplicado:** la fila `.amount-custom` ahora tiene `max-width: 100%` y `align-items: center`; el input gana `min-width: 0` (absorbe el espacio sobrante sin desbordar) y el botón `flex-shrink: 0` + `white-space: nowrap` (nunca se comprime ni empuja el input). En `LogDrinkSheet` se agrega un `useEffect` con ref al contenedor del sheet (`contentRef` nuevo en `BottomSheet`) que recoloca el scroll arriba al abrir y al cambiar de paso.
+- **Commit:** `ab2c549` — 2026-08-13 (branch `fix/sheet-registrar-desborde`, mergeada a main).
+
+### 7. Clima en Setup: tras detectar quedaba "Clima detectado ✓ (volver a detectar)"
+- **Archivo:** `frontend/src/pages/Setup.jsx`.
+- **Problema:** tras el primer uso de "Usar mi ubicación para tu clima", el botón cambiaba a "Clima detectado ✓ (volver a detectar)". Ese "(volver a detectar)" se leía como una instrucción de rehacerlo y confundía (parecía que faltaba algo).
+- **Fix aplicado:** el estado detectado ahora dice "Clima detectado con tu ubicación ✓" — comunica que el dato quedó tomado, sin invitar a repetir. (El botón sigue permitiendo re-detectar si se toca; el hint de abajo ya avisa que se ajusta desde el dashboard.) De paso se limpiaron otras frases raras del mismo onboarding: el hint del sexo ("piso de referencia científico" → "calcular tu meta base según las guías científicas") y el hint de recipientes del paso 2 ("no usamos vasos 'estándar' predefinidos" era confuso y chocaba con el tipo "Recipiente normal" — se quedó solo con el mensaje de valor: calibrar una vez, usar siempre).
+- **Commit:** `4dbb0dd` — 2026-08-13 (branch `fix/textos-onboarding`, mergeada a main).
+
+### 8. Notificaciones "activadas por defecto" que nunca llegaban
+- **Archivos:** `backend/routes/push.js`, `frontend/src/api.js`, `frontend/src/push.js`, `frontend/src/pages/Profile.jsx`.
+- **Problema:** el estado del toggle se derivaba solo de `pushManager.getSubscription()` (lado navegador). Si el navegador conservaba una suscripción que el backend ya no tenía guardada (p.ej. al reiniciarse la base del servidor), la UI mostraba "activadas" y "Enviarme una de prueba" respondía "enviada" cuando en realidad `sendPushToUser` encontraba 0 suscripciones y no llegaba nada. Recién al desactivar/reactivar manualmente (que re-persistía en el backend) la prueba funcionaba.
+- **Fix aplicado:** nuevo endpoint `GET /api/push/subscriptions` (backend) devuelve los endpoints guardados del usuario; `getPushSubscriptionStatus` exige que el endpoint del navegador exista TAMBIÉN en el backend para reportar "activado" (si no, muestra desactivado para re-activar sin fricción). `subscribeToPush` re-persiste la suscripción existente del navegador en vez de intentar crear otra (evita `InvalidStateError` por applicationServerKey distinto y cubre el caso de base reiniciada). `handleTestPush` ahora revisa `result.sent`: si es 0 avisa que la suscripción ya no está activa en el servidor en vez de decir que se envió.
+- **Commit:** `3188fca` — 2026-08-13 (branch `fix/notif-estado-real`, mergeada a main).
+
+### 9. Opción de recipiente que decía "Otro (vaso normal)" confundía
+- **Archivo:** `frontend/src/components/ContainerForm.jsx`.
+- **Problema:** la primera opción del dropdown "Tipo de recipiente" al agregar un recipiente era "Otro (vaso normal)". "Otro" como opción por defecto no comunica que es el caso más común, y "vaso normal" apuntaba a algo que la app no usa (la app no tiene vasos estándar).
+- **Fix aplicado:** la opción `custom` ahora se llama "Recipiente normal".
+- **Commit:** `4dbb0dd` — 2026-08-13 (branch `fix/textos-onboarding`, mergeada a main).
+
 ## Features cerrados
 
 ### Modo oscuro
