@@ -7,7 +7,7 @@
 import { DrinkIcon, DRINK_TYPES } from "../drinkIcons";
 
 const TYPE_OPTIONS = [
-  { id: "custom", label: "Otro (vaso normal)" },
+  { id: "custom", label: "Recipiente normal" },
   { id: "thermos", label: "Termo térmico" },
   { id: "pitcher", label: "Jarra" },
   { id: "dispenser", label: "Botellón / garrafa" },

@@ -143,7 +143,7 @@ export default function Setup() {
               <option value="F">Femenino</option>
               <option value="M">Masculino</option>
             </select>
-            <p className="setup-hint">Se usa junto con tu edad para el piso de referencia científico (IOM).</p>
+            <p className="setup-hint">Se usa junto con tu edad para calcular tu meta base según las guías científicas (IOM).</p>
           </div>
 
           <div className="field">
@@ -195,7 +195,7 @@ export default function Setup() {
           <div className="field">
             <button type="button" className="btn-ghost btn-with-icon" onClick={handleDetectWeather} disabled={weatherLoading}>
               <MapPin size={15} />
-              {weatherLoading ? "Detectando tu clima..." : detectedWeather ? "Clima detectado ✓ (volver a detectar)" : "Usar mi ubicación para tu clima"}
+              {weatherLoading ? "Detectando tu clima..." : detectedWeather ? "Clima detectado con tu ubicación ✓" : "Usar mi ubicación para tu clima"}
             </button>
             {detectedWeather && (
               <p className="setup-hint">
@@ -223,10 +223,9 @@ export default function Setup() {
         <div className="setup-containers">
           <div className="card setup-form">
             <p className="setup-hint">
-              Opcional: no usamos vasos "estándar" predefinidos, así que si mides tu recipiente
-              una vez quedará calibrado para siempre. Pero si prefieres, puedes empezar solo con
-              las cantidades rápidas (250/500/750ml...) y calibrar recipientes después desde tu
-              perfil.
+              Opcional: si mides tu recipiente una vez, quedará calibrado para siempre.
+              Si prefieres, puedes empezar ya con las cantidades rápidas (250/500/750ml...) y calibrar
+              recipientes después desde tu perfil.
             </p>
 
             <ContainerForm
