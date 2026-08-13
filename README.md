@@ -102,50 +102,20 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 - **Feedback visual al registrar**: el número del anillo cuenta hacia arriba en vez de saltar al valor nuevo, con un pulso sutil al cruzar el 100% de la meta. La sección "Hoy registraste" se ubica justo debajo del anillo, con un destello breve al aparecer un registro nuevo y un colapso suave al eliminarlo. Con más de 5 registros, la lista se colapsa con "ver N más". Vibración háptica breve en dispositivos compatibles. Todo respeta `prefers-reduced-motion`.
 
 **Pendiente de esta pasada de diseño:**
-- Onboarding paso a paso (el flujo actual sigue siendo un formulario en 2 pasos).
-- Skeletons/shimmer en estados de carga (hoy son mensajes de texto planos).
-- Transiciones entre pantallas.
+- Onboarding paso a paso (el flujo actual sigue siendo un formulario en 2 pasos, no los 6 pasos cortos del concepto).
+- Pantalla de "Perfil" como resumen (hoy el ícono de perfil en el nav va directo al formulario de edición, no a una vista de resumen).
+- Confeti/anillo que cambia de color al completar la meta más allá del color base (la vibración háptica ya está implementada, ver sección 7).
+- Skeletons/shimmer en los estados de carga (hoy son mensajes de texto planos tipo "Cargando...").
+- Gráficas/sparklines reales en Insights (Historial ya las tiene, ver sección 10).
+- Transiciones entre pantallas de la navegación.
 - Contraste de verdes ajustado a WCAG AA.
 
-**Modo oscuro (hecho):**
-Toggle Claro/Oscuro/Sistema en Perfil → "Apariencia". Persistido en
-`localStorage` (`hydrapp_theme`), aplicado antes del primer render (script
-inline en `index.html`) para evitar flash de tema incorrecto. En modo
-"Sistema" sigue en vivo los cambios de `prefers-color-scheme` del SO.
-- Toda la paleta ya vivía en variables CSS (`index.css`); se agregó un
-bloque `:root[data-theme="dark"]` con los mismos nombres de variable
-(fondos, superficies, texto, y variantes "tint" nuevas para
-success/warning/danger/primary usadas en pills, celdas de calendario,
-hovers, etc.).
-- Se reemplazaron todos los colores hex sueltos que había fuera de
-`index.css` (~20, repartidos en `CenterAlert.css`, `EducationCapsule.css`,
-`HistoryCalendar.css`, `LogDrinkSheet.css`, `StatusCards.css`,
-`TodayLogs.css`, `layout.css`) por las variables semánticas nuevas — así
-ningún componente queda "roto" (mostrando colores claros fijos) al
-cambiar a oscuro.
-- Colores de marca (primary/secondary/success/warning/danger) se
-mantienen reconocibles en ambos modos, solo se ajustó su tono para
-contraste sobre fondo oscuro.
-- Verificado en navegador (12-ago): toggle instántaneo, "Sistema" en vivo
-siguiendo al SO, sin flash de tema al cargar, y contraste correcto en las
-pantallas principales. `npm run build` limpio y `oxlint` sin warnings.
+> Historial en vista calendario: **cerrado**, ver sección 10 de este README.
+> Modo oscuro: **cerrado**, ver sección 10 de este README.
 
-**Historial en vista calendario (hecho):**
-`/historial` tiene ahora un toggle Calendario/Lista (Calendario por
-defecto). La lista original (barras de los últimos 14 días) se conserva.
-- Calendario: grid mensual tipo heatmap (`frontend/src/components/HistoryCalendar.jsx`),
-coloreado por % de meta cumplida (verde ≥80%, amarillo 40-79%, rojo <40%,
-gris sin dato). Navegación mes a mes limitada al rango de datos
-disponible. Tocar un día abre el detalle en un `BottomSheet` existente.
-- Gráfica de tendencia (`frontend/src/components/HistoryChart.jsx`,
-últimos 30 días): SVG puro escrito a mano, sin librería de gráficas —
-decisión consciente para no sumar una dependencia nueva solo para una
-línea con puntos. Si más adelante se necesitan gráficas más complejas
-(barras apiladas, varias series), ahí sí conviene reconsiderar y meter
-una librería (recharts, chart.js).
-- `GET /api/logs/history` no cambió (ya soportaba hasta 90 días); el
-frontend ahora pide 90 para poder navegar meses atrás en el calendario,
-y sigue pidiendo 14 para la vista de lista.
+**Modo oscuro (hecho):** ver sección 10.
+
+**Historial en vista calendario (hecho):** ver sección 10.
 
 ## 3. Frontend
 
@@ -235,12 +205,31 @@ Bugs encontrados usando la app, no solo leyendo código:
 
 ## 8. Qué sigue (v2)
 
+- Recuperación de contraseña.
+- Cola offline real con IndexedDB + Background Sync (la actual es una versión simplificada con localStorage, suficiente pero no tan robusta).
 - Estimación de volumen del vaso por foto (visión por cámara).
 - Balance de electrolitos (sodio/potasio/magnesio).
-- Cola offline real con IndexedDB + Background Sync.
-- Recuperación de contraseña.
+
+> Asistente conversacional (Groq) ya implementado, ver sección 1 (Backend → "Asistente conversacional (Groq)").
+> Vibración háptica ya implementada, ver sección 7. Confeti sigue pendiente, ver "Pendiente de esta pasada de diseño".
 
 ## 9. Deuda técnica conocida (documentada a propósito)
 
 - **JWT sin refresh ni rotación**: el token dura 14 días y no hay forma de revocarlo del lado del servidor si se roba. Aceptable para una app de este tamaño; si crece, valdría la pena una tabla de sesiones o tokens de corta duración + refresh token.
 - **Estimador de volumen por altura** (`Setup.jsx`) usa un diámetro fijo de 7cm — es un puente documentado hacia la estimación por foto real (v2), no una medición precisa.
+
+## 10. Modo oscuro e historial en calendario
+
+### Modo oscuro
+
+Toggle Claro/Oscuro/Sistema en Perfil → "Apariencia". Persistido en `localStorage` (`hydrapp_theme`), aplicado antes del primer render (script inline en `index.html`) para evitar flash de tema incorrecto. En modo "Sistema" sigue en vivo los cambios de `prefers-color-scheme` del SO.
+- Toda la paleta vive en variables CSS (`index.css`); el modo oscuro se resolvió agregando un bloque `:root[data-theme="dark"]` con los mismos nombres de variable (fondos, superficies, texto y variantes "tint" para success/warning/danger/primary) y migrando los ~20 colores hex sueltos que había en los componentes a esas variables — la lógica de ningún componente tuvo que cambiar.
+- Colores de marca se mantienen reconocibles en ambos modos, solo se ajustó su tono para contraste sobre fondo oscuro.
+- Verificado en navegador (12-ago): toggle instántaneo, "Sistema" siguiendo al SO en vivo, sin flash de tema al cargar, y contraste correcto en todas las pantallas.
+
+### Historial en vista calendario
+
+`/historial` tiene ahora un toggle Calendario/Lista (Calendario por defecto). La lista original (barras de los últimos 14 días) se conserva.
+- Calendario: grid mensual tipo heatmap coloreado por % de meta cumplida (verde ≥80%, amarillo 40-79%, rojo <40%, gris sin dato). Navegación mes a mes limitada al rango de datos disponible. Tocar un día abre el detalle en un bottom sheet.
+- Gráfica de tendencia de los últimos 30 días en SVG puro escrito a mano, sin librería de gráficas — decisión consciente para no sumar una dependencia nueva solo para una línea con puntos. Si más adelante se necesitan gráficas más complejas (barras apiladas, varias series), ahí sí conviene reconsiderar una librería (recharts, chart.js).
+- El backend no cambió: `GET /api/logs/history` ya soportaba hasta 90 días; el frontend ahora pide 90 para navegar meses atrás en el calendario (14 para la vista de lista).

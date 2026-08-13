@@ -9,4 +9,5 @@ dev-dist/
 # Documentación e informes internos (no van al repositorio en línea)
 HYDRAPP-CONTEXTO.md
 MEJORA-UX-REGISTRO.md
+AUDITORIA-UX.md
 frontend/README.md

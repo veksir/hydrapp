@@ -143,6 +143,43 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   construir la fecha local (`getFullYear/getMonth/getDate`).
 - **Estado:** merged a main vía fast-forward en `6e6a714` — 2026-08-12.
 
+## Pendiente
+
+Consolidado desde el README (que tenía ítems ya cerrados mezclados con
+pendientes reales — ver commit de limpieza). Actualizar esta lista al
+cerrar cada ítem, moviéndolo a "Bugs resueltos" o "Features cerrados".
+
+### Funcional (mayor impacto)
+- Recuperación de contraseña — no existe, es la única brecha funcional
+  real del backlog (todo lo demás es pulido visual o deuda técnica de
+  bajo impacto).
+- Cola offline real con IndexedDB + Background Sync — hoy es una versión
+  simplificada con `localStorage` (decisión consciente, documentada en
+  README sección 5, M8).
+
+### Diseño / UX
+- Onboarding paso a paso (6 pasos cortos) — hoy sigue siendo un
+  formulario largo en 2 pasos.
+- Pantalla "Perfil" como resumen — hoy el ícono de perfil en el nav va
+  directo al formulario de edición, no a una vista de resumen.
+- Confeti/anillo que cambia de color al completar la meta (la vibración
+  háptica ya está implementada, ver README sección 7).
+- Sparklines/gráficas reales en **Insights** (Historial ya las tiene desde
+  el feature de calendario/gráfica de tendencia).
+- Skeletons/shimmer en estados de carga (hoy son mensajes de texto plano
+  tipo "Cargando...").
+- Transiciones entre pantallas de la navegación.
+- Contraste de verdes ajustado a WCAG AA.
+- Estimador de volumen por altura (`Setup.jsx`) usa diámetro fijo de 7cm.
+
+### Exploratorio (v2, sin comprometer fecha)
+- Estimación de volumen del vaso por foto (visión por cámara).
+- Balance de electrolitos (sodio/potasio/magnesio).
+
+### Deuda técnica (documentada, no urgente)
+- JWT sin refresh ni rotación (dura 14 días, sin revocación server-side
+  salvo borrar la cuenta).
+
 ## Convenciones del repo (ya decididas, no re-discutir)
 
 - Sin GitHub Actions ni widgets de mantenimiento pesado en el README/perfil.
