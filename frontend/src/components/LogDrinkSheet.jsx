@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BottomSheet from "./BottomSheet";
 import { DrinkIcon } from "../drinkIcons";
 import LargeContainerCard from "./LargeContainerCard";
@@ -23,6 +23,14 @@ export default function LogDrinkSheet({ open, onClose, drinkTypes, containers, o
   const [customAmount, setCustomAmount] = useState("");
   const [customError, setCustomError] = useState("");
   const [activeContainerId, setActiveContainerId] = useState(null);
+  const sheetContentRef = useRef(null);
+
+  // Al abrir el sheet o cambiar de paso, el scroll se recoloca arriba: si el
+  // paso anterior era largo (muchos recipientes) y el usuario iba abajo, el
+  // paso nuevo renderizaría "corrido" a la altura del scroll anterior.
+  useEffect(() => {
+    if (sheetContentRef.current) sheetContentRef.current.scrollTop = 0;
+  }, [open, step]);
 
   // Se deriva del prop containers (no de un snapshot) para que, tras una
   // toma parcial o rellenado, el nivel de líquido de la tarjeta refleje el
@@ -87,7 +95,7 @@ export default function LogDrinkSheet({ open, onClose, drinkTypes, containers, o
   const quickContainers = containers.filter((c) => !usesSipFlow(c));
 
   return (
-    <BottomSheet open={open} onClose={handleClose} title={title}>
+    <BottomSheet open={open} onClose={handleClose} title={title} contentRef={sheetContentRef}>
       {step === 1 && (
         <>
           {sipContainers.length > 0 && (

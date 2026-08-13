@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { X } from "lucide-react";
 import "./BottomSheet.css";
 
-export default function BottomSheet({ open, onClose, title, children }) {
+export default function BottomSheet({ open, onClose, title, children, contentRef }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -14,7 +14,7 @@ export default function BottomSheet({ open, onClose, title, children }) {
 
   return (
     <div className="bottom-sheet__backdrop" onClick={onClose}>
-      <div className="bottom-sheet" onClick={(e) => e.stopPropagation()}>
+      <div className="bottom-sheet" ref={contentRef} onClick={(e) => e.stopPropagation()}>
         <button className="bottom-sheet__close" onClick={onClose} aria-label="Cerrar">
           <X size={18} />
         </button>

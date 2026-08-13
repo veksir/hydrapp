@@ -183,11 +183,20 @@
 .amount-custom {
   display: flex;
   gap: 8px;
+  align-items: center;
+  max-width: 100%;
 }
 .amount-custom input {
   flex: 1;
+  min-width: 0;
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 12px 14px;
 }
 .amount-custom input:focus { border-color: var(--primary); }
+/* El botón no debe comprimirse ni empujar el input fuera del ancho del
+   sheet: se fija su ancho al del texto y el input absorbe el resto. */
+.amount-custom .btn-primary {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
