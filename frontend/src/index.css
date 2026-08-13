@@ -12,7 +12,7 @@
   --primary: #2F80ED;      /* azul profundo */
   --primary-deep: #1F5FC4;
   --secondary: #3CCFCF;    /* turquesa */
-  --success: #49C27A;      /* estado excelente */
+  --success: #2A7E4C;      /* estado excelente — WCAG AA (4.5:1+) como texto sobre --surface/--bg/--success-tint */
   --warning: #F4C542;      /* precaución */
   --danger: #FF6B6B;       /* riesgo */
 
@@ -22,7 +22,7 @@
      acá (en vez de hex sueltos por componente) para que el tema oscuro
      los pueda sobreescribir en un solo lugar. */
   --success-tint: #E4F8ED;
-  --success-tint-ink: #1E8A50;
+  --success-tint-ink: #1B7E49;
   --warning-tint: #FDF3DC;
   --warning-tint-ink: #B87A17;
   --danger-tint: #FFEBEB;
