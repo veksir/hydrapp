@@ -11,16 +11,22 @@ async function request(path, { method = "GET", body, auth = true } = {}) {
     if (token) headers.Authorization = `Bearer ${token}`;
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+
   let res;
   try {
     res = await fetch(`${BASE_URL}${path}`, {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
     });
   } catch {
+    clearTimeout(timeout);
     throw new Error("No se pudo conectar con el servidor. Revisa tu conexión.");
   }
+  clearTimeout(timeout);
 
   if (res.status === 401 && auth) {
     localStorage.removeItem("hydrapp_token");
