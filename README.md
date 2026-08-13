@@ -29,6 +29,8 @@ Por defecto queda escuchando en `http://localhost:4000`. La base de datos es un 
 | POST | `/api/auth/login` | Iniciar sesión |
 | GET/PUT | `/api/profile` | Ver/guardar perfil (peso, edad, sexo, clima, horarios...) |
 | GET/POST/DELETE | `/api/containers` | Recipientes calibrados por el usuario |
+| PUT | `/api/containers/:id` | Editar recipiente (nombre, volumen, tipo, contenido) |
+| POST | `/api/containers/:id/sip` | Toma parcial de un recipiente con seguimiento (decanta del volumen restante) |
 | POST | `/api/logs` | Registrar un consumo de agua |
 | GET | `/api/logs/today` | Meta del día, consumido, predicción de ritmo, insumos usados |
 | PUT | `/api/logs/context/today` | Ajustar actividad/clima del día puntual (update parcial) |
@@ -89,9 +91,10 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 - **Paleta**: azul profundo `#2F80ED` + turquesa `#3CCFCF`, fondo `#F7F9FC` (no blanco puro), estados verde/amarillo/coral para excelente/precaución/riesgo.
 - **Home**: anillo de progreso circular (no botella), tarjetas pequeñas de "Estado de hidratación" (concentración/rendimiento/clima/actividad), cápsula educativa diaria, y un mensaje que puede ser una predicción de sed real en vez de solo "vas al X%".
 - **Registro en dos toques**: botón flotante central en el nav → bottom sheet → tipo de bebida → cantidad. Sin formularios.
+- **Recipientes con toma parcial**: un termo/jarra/botellón (`container_type` ≠ `custom`) o cualquier recipiente >3000ml no se registra de una sola vez: abre una tarjeta con el nivel de líquido restante (reinicia solo cada día), tomas parciales que decantan del `current_volume`, rellenado manual y su propio contenido (`drink_type` con factor de hidratación) que manda sobre la selección global del sheet. Los recipientes se pueden editar (nombre, volumen, tipo, contenido) desde el Perfil. Ver `LargeContainerCard.jsx` y `backend/routes/containers.js`.
 - **Tipos de bebida** con factor de hidratación real (agua/deportiva/leche=1.0, té/café=0.95, jugo=0.9, refresco=0.85) — el café cuenta como líquido, con un descuento menor en bebidas azucaradas o con cafeína alta.
 - **Insights**: promedio semanal/mensual, mejor día, racha, e insight dinámico tipo "cuando hace más de 30°C tomas X% menos".
-- **Perfil real**: `/perfil` (`frontend/src/pages/Profile.jsx`) precarga los datos existentes del usuario, permite editarlos, gestionar recipientes (agregar/eliminar) y cerrar sesión — separado del flujo de onboarding inicial (`/configurar`, `Setup.jsx`), que ya no obliga a calibrar un recipiente para poder empezar.
+- **Perfil real**: `/perfil` (`frontend/src/pages/Profile.jsx`) precarga los datos existentes del usuario, permite editarlos, gestionar recipientes (agregar/editar/eliminar, con contenido y tipo propios) y cerrar sesión — separado del flujo de onboarding inicial (`/configurar`, `Setup.jsx`), que ya no obliga a calibrar un recipiente para poder empezar.
 - **Registros de hoy** visibles en el dashboard (hora + tipo + cantidad), con opción de borrar cada uno con confirmación.
 - **Detección de ráfaga**: además de evaluar cada registro por separado, `backend/utils/logFeedback.js` suma el volumen bruto registrado en los últimos 10 minutos (`recentBurstMl`) para avisar de consumo alto acumulado en poco tiempo, sin importar el tamaño de cada registro individual.
 - **Actividad de hoy**: la tarjeta "Actividad" del dashboard es tocable y abre un sheet para registrar los minutos de ejercicio del día (`PUT /logs/context/today`), que ajustan la meta. `activity_is_live` distingue si ese dato fue reportado hoy o es el promedio por defecto del perfil.
@@ -205,6 +208,10 @@ Bugs encontrados usando la app, no solo leyendo código:
 
 **Cuarta vuelta (auditoría de UX, 12-ago)**
 - **Tocar un punto de la gráfica de tendencia del Historial era casi imposible en el celular**: el punto visual mide ~5px y el tooltip solo se activaba tocando EXACTAMENTE ese punto. Ahora la gráfica usa pointer events que resuelven el día por la **coordenada X** del toque (un dedo de ~48px siempre cae en el día más cercano), con guía vertical en el día activo y **scrub**: manteniendo y deslizando el dedo se recorre el detalle día a día. El dibujo y el hover del mouse en desktop no cambiaron. Ver `AUDITORIA-UX.md` (ítem 16).
+
+**Quinta vuelta (13-ago, feature de recipientes con toma parcial)**
+- **El borrado de registros usaba el `window.confirm` del navegador**: rompía el estilo y el idioma del producto. Reemplazado por `ConfirmDialog`, un diálogo propio con botón de acción en rojo, que además respeta el guard anti doble-tap del borrado animado.
+- **Sin forma de cerrar el sheet del "+" cuando cubría toda la pantalla**: con varios recipientes de toma parcial, el sheet ocupaba el 85vh y el backdrop (lo único tocable para cerrar) quedaba fuera de la vista — en celular no había escape salvo el botón atrás del sistema. `BottomSheet` ahora tiene botón de cierre "×" fijo en la esquina superior, visible en todos los pasos. Aplica también al sheet de actividad y al detalle del calendario.
 
 ## 8. Qué sigue (v2)
 
