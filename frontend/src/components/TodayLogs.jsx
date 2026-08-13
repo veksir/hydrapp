@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Trash2 } from "lucide-react";
 import { DrinkIcon } from "../drinkIcons";
+import ConfirmDialog from "./ConfirmDialog";
 import "./TodayLogs.css";
 
 const COLLAPSE_AFTER = 5;
@@ -11,10 +12,10 @@ export default function TodayLogs({ logs, onDelete, highlightId }) {
   const navigate = useNavigate();
   const [removingIds, setRemovingIds] = useState(new Set());
   const [showAll, setShowAll] = useState(false);
-  // Guard síncrono aparte del estado: window.confirm() bloquea el hilo, así
-  // que un doble click/tap puede dejar un segundo handleDelete(id) encolado
-  // que se ejecuta antes de que el re-render con removingIds se aplique. Un
-  // ref evita esa ventana.
+  const [pendingId, setPendingId] = useState(null);
+  // Guard síncrono aparte del estado: evita que un doble click/tap deje un
+  // segundo handleDelete(id) encolado que se ejecuta antes de que el
+  // re-render con removingIds se aplique.
   const removingRef = useRef(new Set());
 
   if (!logs.length) return null;
@@ -23,9 +24,16 @@ export default function TodayLogs({ logs, onDelete, highlightId }) {
   const visible = showAll ? ordered : ordered.slice(0, COLLAPSE_AFTER);
   const hiddenCount = ordered.length - visible.length;
 
+  // El diálogo de confirmación propio reemplaza al window.confirm() del
+  // navegador (estilo + idioma del producto). La fila solo se marca como
+  // "removiendo" cuando el usuario confirma en el diálogo.
+  function askDelete(id) {
+    if (removingRef.current.has(id)) return;
+    setPendingId(id);
+  }
+
   async function handleDelete(id) {
     if (removingRef.current.has(id)) return;
-    if (!window.confirm("¿Eliminar este registro?")) return;
     removingRef.current.add(id);
     setRemovingIds((prev) => new Set(prev).add(id));
     setTimeout(async () => {
@@ -57,10 +65,24 @@ export default function TodayLogs({ logs, onDelete, highlightId }) {
             log={log}
             isNew={log.id === highlightId}
             isRemoving={removingIds.has(log.id)}
-            onDelete={() => handleDelete(log.id)}
+            onDelete={() => askDelete(log.id)}
           />
         ))}
       </ul>
+      <ConfirmDialog
+        open={pendingId !== null}
+        title="¿Eliminar este registro?"
+        message="Esta acción no se puede deshacer."
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        tone="danger"
+        onCancel={() => setPendingId(null)}
+        onConfirm={() => {
+          const id = pendingId;
+          setPendingId(null);
+          handleDelete(id);
+        }}
+      />
       {hiddenCount > 0 && (
         <button className="btn-ghost today-logs__more" onClick={() => setShowAll(true)}>
           Ver {hiddenCount} más

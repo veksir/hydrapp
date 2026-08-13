@@ -10,6 +10,7 @@
 }
 
 .bottom-sheet {
+  position: relative;
   width: 100%;
   max-width: 480px;
   background: var(--surface);
@@ -20,7 +21,31 @@
   gap: 16px;
   max-height: 85vh;
   overflow-y: auto;
+  scrollbar-width: none; /* Firefox: la barra de scroll afea el sheet */
+  -ms-overflow-style: none;
   animation: sheet-in 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.bottom-sheet::-webkit-scrollbar {
+  display: none; /* Chrome/Safari/Edge */
+}
+
+.bottom-sheet__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-soft);
+  z-index: 1;
+}
+.bottom-sheet__close:hover {
+  background: var(--surface-sunk);
+  color: var(--ink);
 }
 
 .bottom-sheet__handle {
