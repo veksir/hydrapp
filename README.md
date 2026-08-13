@@ -203,6 +203,9 @@ Bugs encontrados usando la app, no solo leyendo código:
 - **Notificaciones atascadas en "Procesando..." en PC**: Vite solo genera el service worker en el build de producción por defecto; en `npm run dev` no había ninguno registrado, así que `navigator.serviceWorker.ready` nunca se resolvía. Ahora `devOptions` está activado en `vite.config.js`, así que también funciona en desarrollo.
 - **Despertar antes de la hora configurada generaba una "deuda" falsa**: efecto secundario del arreglo de la vuelta anterior (la recalibración por inicio tardío se disparaba también al despertar temprano). Corregido: ahora solo recalibra cuando efectivamente se despierta después de la hora configurada; si es antes, el día simplemente "no ha empezado" según el perfil, sin deuda. Validado en tres casos por separado (madrugador, horario normal, trasnochador). Ver `backend/utils/dailyStatus.js` y `backend/utils/predictor.js`.
 
+**Cuarta vuelta (auditoría de UX, 12-ago)**
+- **Tocar un punto de la gráfica de tendencia del Historial era casi imposible en el celular**: el punto visual mide ~5px y el tooltip solo se activaba tocando EXACTAMENTE ese punto. Ahora cada día con registro tiene un área táctil de columna entera superpuesta (`HistoryChart.jsx`), así cualquier toque en la franja vertical de ese día abre el detalle; el dibujo y el hover del punto en desktop no cambiaron. Ver `AUDITORIA-UX.md` (ítem 16).
+
 ## 8. Qué sigue (v2)
 
 - Recuperación de contraseña.

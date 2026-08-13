@@ -81,6 +81,21 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   siempre mensaje controlado; respuesta válida resuelve correctamente.
 - **Commit:** `6db65b8` — 2026-08-11 (branch `fix/delete-race-and-weather-nulls`, mergeada a main).
 
+### 4. Tocar la gráfica de tendencia en Historial era casi imposible en el celular
+- **Archivo:** `frontend/src/components/HistoryChart.jsx` (+`.css`). Hallazgo de
+  `AUDITORIA-UX.md` (ítem 16, prioridad media).
+- **Problema:** cada punto se dibujaba con `r=2.5` (diámetro real ~5px) y el
+  tooltip solo se activaba con `onMouseEnter`/`onTouchStart` exactamente sobre
+  ese punto. El dedo cubre varios días y el target era diminuto: el hint
+  "Toca un punto para ver el detalle" fallaba en casi todos los toques en móvil.
+- **Fix aplicado:** se implementó la opción de "columna entera" que proponía la
+  auditoría. Cada día con registro tiene un `rect` transparente que cubre toda
+  la altura del gráfico y el ancho de su columna (`HistoryChart.jsx`), así
+  cualquier toque dentro de esa franja vertical activa el tooltip del día. La
+  línea y los puntos quedan por encima del rect, así que el hover preciso del
+  punto se conserva en desktop. El dibujo visual no cambió (punto de 2.5px).
+- **Commit:** pendiente de merge (branch `fix/trend-touch-target`).
+
 ## Features cerrados
 
 ### Modo oscuro

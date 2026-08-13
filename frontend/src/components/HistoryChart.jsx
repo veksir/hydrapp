@@ -31,6 +31,10 @@ export default function HistoryChart({ rows }) {
 
   if (points.length < 2) return null;
 
+  // Área táctil de una columna completa por día: el punto visual mide ~5px y
+  // era casi imposible de tocar; ahora toda la columna del día captura el toque.
+  const step = (WIDTH - PAD_X * 2) / (points.length - 1);
+
   // Construye el path solo entre puntos consecutivos que SÍ tienen dato,
   // para no dibujar una línea falsa cruzando los días sin registro.
   const segments = [];
@@ -55,6 +59,20 @@ export default function HistoryChart({ rows }) {
         className="history-chart__svg"
         onMouseLeave={() => setHover(null)}
       >
+        {points.map((p, i) =>
+          p.y !== null ? (
+            <rect
+              key={`hit-${i}`}
+              className="history-chart__hit"
+              x={p.x - step / 2}
+              y={PAD_TOP}
+              width={step}
+              height={HEIGHT - PAD_TOP - PAD_BOTTOM}
+              onMouseEnter={() => setHover(i)}
+              onTouchStart={() => setHover(i)}
+            />
+          ) : null
+        )}
         <line x1={PAD_X} y1={goalY} x2={WIDTH - PAD_X} y2={goalY} className="history-chart__goal-line" />
 
         {segments.map((seg, si) => (

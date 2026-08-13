@@ -23,6 +23,11 @@
   stroke-dasharray: 4 4;
 }
 
+.history-chart__hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
 .history-chart__line {
   fill: none;
   stroke: var(--primary);
