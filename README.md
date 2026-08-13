@@ -221,6 +221,9 @@ Bugs encontrados usando la app, no solo leyendo código:
 - **Notificaciones que aparecían "activadas" sin llegar nunca**: el toggle se basaba solo en la suscripción del navegador; si el backend perdía la guardada (base reiniciada), la UI mostraba activadas y "Enviarme una de prueba" no llegaba (0 suscripciones server-side). Ahora el estado exige que el endpoint también exista en el backend (`GET /api/push/subscriptions`), al reactivar se re-persiste la suscripción existente en vez de crear otra, y la prueba avisa honestamente cuando `sent: 0`. Ver `push.js` frontend, `routes/push.js` backend.
 - **"Otro (vaso normal)" como primera opción de tipo de recipiente confundía**: ahora se llama "Recipiente normal". Ver `ContainerForm.jsx`.
 
+**Séptima vuelta (13-ago, recomendaciones de reposición)**
+- **Las recomendaciones de "ponerse al día" empujaban a tomar mucha agua de golpe**: al llevar mucho rato sin tomar agua, el déficit crecía y el mensaje lo reportaba como objetivo inmediato ("Vas 1800ml por detrás de tu ritmo esperado. Toma agua ahora."), invitando a recuperarlo de una vez — justo lo que la misma app desaconseja (el cuerpo absorbe mejor el agua distribuida que en una gran toma única, ver `logFeedback.js`). Ahora el estado muy atrasado reporta el déficit con honestidad y la recuperación la retoma la app: "Vas 1764ml por detrás de tu ritmo. Registra un vaso ahora y retoma tu ritmo normal — no intentes recuperar todo de una sola vez." La acción es en la unidad real de la app (un vaso), sin tope para la sed. El asistente (Groq) recibió la misma regla en su prompt. Ver `backend/utils/predictor.js`, `backend/utils/assistant.js`.
+
 ## 8. Qué sigue (v2)
 
 - Recuperación de contraseña.

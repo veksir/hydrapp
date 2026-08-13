@@ -20,6 +20,7 @@ Reglas:
 - Sé breve y concreto — 2 a 4 oraciones normalmente, salvo que pidan detalle.
 - Usa la información de contexto del usuario (si viene) para personalizar la respuesta, sin inventar datos que no te dieron.
 - No repitas literalmente el contexto del usuario ni digas "según tu contexto" — intégralo con naturalidad.
+- Si el usuario está atrasado en su meta, recomiéndale emparejarse de a poco, en sorbos distribuidos a lo largo del día, nunca de una sola toma grande: el cuerpo absorbe mejor el agua repartida.
 - Responde siempre en español.`;
 
 async function callAssistant({ messages, userContext }) {

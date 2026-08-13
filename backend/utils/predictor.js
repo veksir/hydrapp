@@ -161,7 +161,15 @@ function getHydrationStatus({
     message = "Buenos días. Cuando puedas, arranca el día con un vaso de agua.";
   } else if (deficit > muyAtrasadoThreshold) {
     status = "muy_atrasado";
-    message = `Vas ${Math.round(deficit)}ml por detrás de tu ritmo esperado. Toma agua ahora.`;
+    // El déficit se reporta con honestidad, pero la recuperación se encarga
+    // la app: "retomar el ritmo normal" (los checkpoints siguen). La acción
+    // inmediata es un vaso — la unidad que la app maneja — y el único caveat
+    // científico es no intentar recuperar el total de una sola vez (el cuerpo
+    // no absorbe bien una gran toma única; ver logFeedback). Sin tope: si
+    // queda sed, se sigue tomando normal.
+    message =
+      `Vas ${Math.round(deficit)}ml por detrás de tu ritmo. Registra un vaso ahora ` +
+      `y retoma tu ritmo normal — no intentes recuperar todo de una sola vez.`;
   } else if (deficit > atrasadoThreshold) {
     status = "atrasado";
     message = `Estás un poco atrasado (${Math.round(deficit)}ml). Un vaso de agua ahora te pone al día.`;
