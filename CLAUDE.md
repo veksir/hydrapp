@@ -99,7 +99,34 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   scroll de la página robe el gesto. El dibujo visual no cambió (punto de
   2.5px, 6px al activo) y el hover del mouse se conserva vía los mismos
   pointer events.
-- **Commit:** pendiente de merge (branch `fix/trend-touch-target`).
+- **Commit:** `437068e`/`0f53348`/`e3b2365` — 2026-08-13 (mergeado a main;
+  este archivo tenía el estado desactualizado como "pendiente de merge").
+  `3949c7c` (timeout en fetch de Dashboard) es un fix aparte de la misma
+  sesión, no relacionado al touch target.
+
+### 5. Contraste de verdes por debajo de WCAG AA
+- **Archivo:** `frontend/src/index.css` (solo bloque `:root`, modo claro).
+- **Problema:** `--success` (`#49C27A`) usado como color de **texto** (valor
+  en `StatusCards`, pill "OK", chips de meta cumplida en el dashboard,
+  `--success-tint-ink` en el número del día en `HistoryCalendar`) daba
+  ratios de 2.04–3.94:1 contra los fondos donde se usa (`--surface`,
+  `--bg`, `--success-tint`). WCAG AA exige 4.5:1 para texto normal (los
+  usos son 13–15px, ninguno califica como "texto grande"). El modo oscuro
+  (`--success: #5FD895`) ya cumplía de sobra (8.2–10.5:1), no se tocó.
+- **Fix aplicado:** se oscureció `--success` a `#2A7E4C` y
+  `--success-tint-ink` a `#1B7E49` (mismo tono, luminosidad ajustada), sin
+  tocar ningún componente — mismo patrón que el modo oscuro: la paleta
+  vive centralizada en variables CSS, así que el fix es solo ahí. No
+  quedaban hex sueltos del verde viejo fuera de `index.css` (se verificó
+  con grep).
+- **Verificado:** ratios recalculados (fórmula WCAG relative luminance):
+  texto sobre `--surface` 5.02:1, sobre `--bg` 4.76:1, sobre
+  `--success-tint` 4.53:1, `--success-tint-ink` sobre `--success-tint`
+  4.59:1 — los 4 pasan AA. `npm run build` limpio, `oxlint` sin warnings
+  nuevos (9 preexistentes, ninguno en archivos tocados — el cambio es
+  puramente CSS). Pendiente: revisión visual manual de Kevin en
+  Dashboard/Historial/Perfil en claro y oscuro.
+- **Commit:** pendiente (branch `fix/wcag-contraste-verde`).
 
 ## Features cerrados
 
@@ -189,7 +216,6 @@ cerrar cada ítem, moviéndolo a "Bugs resueltos" o "Features cerrados".
 - Skeletons/shimmer en estados de carga (hoy son mensajes de texto plano
   tipo "Cargando...").
 - Transiciones entre pantallas de la navegación.
-- Contraste de verdes ajustado a WCAG AA.
 - Estimador de volumen por altura (`Setup.jsx`) usa diámetro fijo de 7cm.
 
 ### Exploratorio (v2, sin comprometer fecha)

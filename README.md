@@ -108,10 +108,10 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 - Skeletons/shimmer en los estados de carga (hoy son mensajes de texto planos tipo "Cargando...").
 - Gráficas/sparklines reales en Insights (Historial ya las tiene, ver sección 10).
 - Transiciones entre pantallas de la navegación.
-- Contraste de verdes ajustado a WCAG AA.
 
 > Historial en vista calendario: **cerrado**, ver sección 10 de este README.
 > Modo oscuro: **cerrado**, ver sección 10 de este README.
+> Contraste de verdes (WCAG AA): **cerrado**, ver CLAUDE.md.
 
 **Modo oscuro (hecho):** ver sección 10.
 
