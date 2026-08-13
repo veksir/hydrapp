@@ -135,6 +135,48 @@ export default function Dashboard({ user }) {
     }
   }
 
+  // Toma parcial de un recipiente (termo/jarra/botellón o >3000ml):
+  // descuenta del nivel y registra en la lógica normal de logs. El éxito NO
+  // muestra el toast centrado porque tapa el sheet y esconde la animación
+  // del nivel bajando — la tarjeta ya confirma con su mensaje inline y el
+  // anillo de meta se actualiza tras el re-fetch.
+  async function handleSip({ container_id, amount_ml, drink_type }) {
+    setError("");
+    setSubmitting(true);
+    try {
+      const res = await api.sipContainer(container_id, { amount_ml, drink_type });
+      setHighlightId(res.log.id);
+      if (navigator.vibrate) navigator.vibrate(30);
+      await load();
+    } catch (err) {
+      if (isNetworkError(err)) {
+        addToOfflineQueue({ drink_type, amount_ml, container_id });
+        setPendingSync(queueLength());
+        setLogFeedback({
+          level: "info",
+          message: "Sin conexión ahora mismo. Guardé tu registro y lo voy a enviar en cuanto vuelva la señal.",
+        });
+      } else {
+        setLogFeedback({ level: "danger", message: err.message });
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleRefill(containerId) {
+    setError("");
+    setSubmitting(true);
+    try {
+      await api.refillContainer(containerId);
+      await load();
+    } catch (err) {
+      setLogFeedback({ level: "danger", message: err.message });
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function handleLiveWeather() {
     setWeatherError("");
     setWeatherLoading(true);
@@ -271,6 +313,8 @@ export default function Dashboard({ user }) {
         drinkTypes={drinkTypes}
         containers={containers}
         onSubmit={handleLog}
+        onSip={handleSip}
+        onRefill={handleRefill}
         submitting={submitting}
       />
 

@@ -1,0 +1,235 @@
+.lcc {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.lcc__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.lcc__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.lcc__type-icon {
+  color: var(--primary);
+}
+
+.lcc__refill {
+  flex-shrink: 0;
+}
+
+/* ---------- Cuerpo en dos columnas: lo que queda del lado izquierdo, los
+   controles del derecho. Las etiquetas de sección alineadas arriba de cada
+   columna y el divisor hacen que el ojo lea los dos grupos como unidades
+   separadas sin recurrir a cajas. ---------- */
+.lcc__body {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+  padding-top: 2px;
+}
+
+.lcc__visual-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.lcc__controls {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Etiqueta mínima que ancla cada grupo (mismo estilo que el label de
+   sección del sheet). Al estar ambas a la misma altura crean la
+   alineación paralela de las dos columnas. */
+.lcc__section-tag {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.lcc__content-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.lcc__controls-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+}
+
+/* ---------- Visual del líquido ---------- */
+.lcc__visual {
+  position: relative;
+  width: 90px;
+  border: 2px solid var(--border);
+  background: var(--surface-sunk);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+}
+
+.lcc__visual--thermos {
+  height: 130px;
+  border-radius: var(--radius-md) var(--radius-md) var(--radius-sm) var(--radius-sm);
+}
+
+.lcc__visual--pitcher {
+  height: 120px;
+  width: 110px;
+  border-radius: var(--radius-sm) var(--radius-sm) var(--radius-md) var(--radius-md);
+}
+
+.lcc__visual--dispenser {
+  height: 150px;
+  width: 70px;
+  border-radius: 26px 26px var(--radius-sm) var(--radius-sm);
+}
+
+.lcc__liquid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, var(--secondary), var(--primary));
+  transition: height 0.7s cubic-bezier(0.5, 0, 0.25, 1);
+  will-change: height;
+}
+
+/* Onda en la superficie del líquido: patrón de seno repetido (SVG inline)
+   que se desliza horizontalmente — CSS puro, sin dependencias. */
+.lcc__wave {
+  position: absolute;
+  top: -8px;
+  left: -48px;
+  right: -48px;
+  height: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 8' preserveAspectRatio='none'%3E%3Cpath d='M0 4 Q6 0 12 4 T24 4 T36 4 T48 4' fill='none' stroke='white' stroke-opacity='0.55' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  animation: lcc-wave-slide 2.4s linear infinite;
+}
+
+@keyframes lcc-wave-slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(-48px); }
+}
+
+.lcc__empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lcc__readout {
+  text-align: center;
+  line-height: 1.1;
+}
+.lcc__readout strong {
+  display: block;
+  font-size: 22px;
+  color: var(--primary-deep);
+}
+.lcc__readout span {
+  font-size: 12px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.lcc__content-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--surface-sunk);
+  color: var(--ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+  max-width: 100%;
+}
+.lcc__content-chip svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.lcc__content-chip .lcc__content-chip-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lcc__content-factor {
+  color: var(--ink-soft);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* ---------- Selector de cantidad ---------- */
+.amount-option--active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.lcc__controls .amount-grid {
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.lcc__controls .amount-option {
+  padding: 12px 6px;
+  font-size: 14px;
+}
+
+.lcc__slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lcc__slider-row input[type="range"] {
+  flex: 1;
+  accent-color: var(--primary);
+}
+.lcc__slider-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary-deep);
+  min-width: 44px;
+  text-align: right;
+}
+
+.lcc__confirm {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lcc__wave {
+    animation: none;
+  }
+  .lcc__liquid {
+    transition: none;
+  }
+}

@@ -62,6 +62,75 @@
   gap: 10px;
 }
 
+/* Lista vertical de recipientes con tomas parciales (paso 1 del sheet).
+   Cada fila ocupa el ancho completo, así se ven varios a la vez sin
+   estrujarse y cada una lleva su mini nivel de líquido. */
+.sip-container-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sip-container-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface-sunk);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  text-align: left;
+  transition: transform 0.1s ease, background 0.15s ease;
+}
+.sip-container-row:hover { background: var(--primary-tint-strong); }
+.sip-container-row:active { transform: scale(0.98); }
+
+.sip-container-row__main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sip-container-row__name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sip-container-row__vol {
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+/* Mini indicador de nivel vertical a la derecha de la fila. */
+.sip-container-row__level {
+  width: 8px;
+  height: 40px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sip-container-row__fill {
+  width: 100%;
+  background: linear-gradient(180deg, var(--secondary), var(--primary));
+  border-radius: 999px 999px 0 0;
+  transition: height 0.4s ease;
+}
+
 .container-quick-option {
   background: var(--primary-tint);
   border: 1.5px solid var(--primary-tint-border);
@@ -77,6 +146,15 @@
 .container-quick-option:active { transform: scale(0.96); }
 .container-quick-option__name { font-weight: 700; font-size: 14px; color: var(--ink); }
 .container-quick-option__vol { font-size: 12px; color: var(--primary-deep); font-weight: 600; }
+
+.container-quick-option__badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--secondary);
+  margin-top: 2px;
+}
 
 .amount-grid {
   display: grid;

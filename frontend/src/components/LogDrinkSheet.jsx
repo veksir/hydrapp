@@ -1,21 +1,40 @@
 import { useState } from "react";
 import BottomSheet from "./BottomSheet";
 import { DrinkIcon } from "../drinkIcons";
+import LargeContainerCard from "./LargeContainerCard";
 import "./LogDrinkSheet.css";
 
 const QUICK_AMOUNTS = [250, 350, 500, 750, 1000];
 
-export default function LogDrinkSheet({ open, onClose, drinkTypes, containers, onSubmit, submitting }) {
+// Un recipiente se registra por tomas parciales si el usuario lo marcó como
+// termo/jarra/botellón (container_type) sin importar su volumen — un termo
+// chico también se vacía de a sorbos — o si es grande (>3000ml) aunque no
+// tenga tipo asignado (recipientes migrados de antes del feature).
+function usesSipFlow(container) {
+  return (
+    (container.container_type && container.container_type !== "custom") ||
+    Number(container.volume_ml) > 3000
+  );
+}
+
+export default function LogDrinkSheet({ open, onClose, drinkTypes, containers, onSubmit, onSip, onRefill, submitting }) {
   const [step, setStep] = useState(1);
   const [drinkType, setDrinkType] = useState("agua");
   const [customAmount, setCustomAmount] = useState("");
   const [customError, setCustomError] = useState("");
+  const [activeContainerId, setActiveContainerId] = useState(null);
+
+  // Se deriva del prop containers (no de un snapshot) para que, tras una
+  // toma parcial o rellenado, el nivel de líquido de la tarjeta refleje el
+  // current_volume actualizado que devuelve el re-fetch.
+  const activeContainer = containers.find((c) => c.id === activeContainerId) || null;
 
   function reset() {
     setStep(1);
     setDrinkType("agua");
     setCustomAmount("");
     setCustomError("");
+    setActiveContainerId(null);
   }
 
   function handleClose() {
@@ -33,8 +52,16 @@ export default function LogDrinkSheet({ open, onClose, drinkTypes, containers, o
     handleClose();
   }
 
-  async function pickContainer(container) {
-    await onSubmit({ drink_type: drinkType, container_id: container.id });
+  // Los termos/jarras/botellones (y cualquier recipiente grande) NO se
+  // registran de una sola vez: abren la sección de toma parcial con su nivel
+  // de líquido restante. El contenido lo define el propio recipiente.
+  function pickContainer(container) {
+    if (usesSipFlow(container)) {
+      setActiveContainerId(container.id);
+      setStep(3);
+      return;
+    }
+    onSubmit({ drink_type: drinkType, container_id: container.id });
     handleClose();
   }
 
@@ -50,17 +77,53 @@ export default function LogDrinkSheet({ open, onClose, drinkTypes, containers, o
     handleClose();
   }
 
+  const title = step === 1 ? "¿Qué tomaste?" : step === 2 ? "¿Cuánto?" : activeContainer?.name || "Toma parcial";
+
+  // Los recipientes con tomas parciales (termos/jarras/botellones) se acceden
+  // directo desde el primer paso — no tiene sentido obligar a elegir una
+  // bebida para después elegir recipiente. Los de toque rápido (vaso normal)
+  // siguen en el paso de cantidad.
+  const sipContainers = containers.filter(usesSipFlow);
+  const quickContainers = containers.filter((c) => !usesSipFlow(c));
+
   return (
-    <BottomSheet open={open} onClose={handleClose} title={step === 1 ? "¿Qué tomaste?" : "¿Cuánto?"}>
+    <BottomSheet open={open} onClose={handleClose} title={title}>
       {step === 1 && (
-        <div className="drink-grid">
-          {drinkTypes.map((d) => (
-            <button key={d.id} className="drink-option" onClick={() => pickDrink(d.id)}>
-              <span className="drink-option__icon"><DrinkIcon type={d.id} size={24} /></span>
-              <span>{d.label}</span>
-            </button>
-          ))}
-        </div>
+        <>
+          {sipContainers.length > 0 && (
+            <div className="amount-section">
+              <p className="amount-section__label">Tus recipientes</p>
+              <ul className="sip-container-list">
+                {sipContainers.map((c) => {
+                  const level = Number(c.volume_ml) > 0
+                    ? Math.max(0, Math.min(100, (Number(c.current_volume ?? c.volume_ml) / Number(c.volume_ml)) * 100))
+                    : 0;
+                  return (
+                    <li key={c.id}>
+                      <button className="sip-container-row" disabled={submitting} onClick={() => pickContainer(c)}>
+                        <span className="sip-container-row__main">
+                          <span className="sip-container-row__name">{c.name}</span>
+                          <span className="sip-container-row__vol">{c.volume_ml}ml · toma parcial</span>
+                        </span>
+                        <span className="sip-container-row__level">
+                          <span className="sip-container-row__fill" style={{ height: `${level}%` }} />
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+          <div className="drink-grid">
+            {drinkTypes.map((d) => (
+              <button key={d.id} className="drink-option" onClick={() => pickDrink(d.id)}>
+                <span className="drink-option__icon"><DrinkIcon type={d.id} size={24} /></span>
+                <span>{d.label}</span>
+              </button>
+            ))}
+          </div>
+        </>
       )}
 
       {step === 2 && (
@@ -82,11 +145,11 @@ export default function LogDrinkSheet({ open, onClose, drinkTypes, containers, o
             return null;
           })()}
 
-          {containers.length > 0 && (
+          {quickContainers.length > 0 && (
             <div className="amount-section">
               <p className="amount-section__label">Tus recipientes calibrados</p>
               <div className="container-quick-grid">
-                {containers.map((c) => (
+                {quickContainers.map((c) => (
                   <button
                     key={c.id}
                     className="container-quick-option"
@@ -130,6 +193,21 @@ export default function LogDrinkSheet({ open, onClose, drinkTypes, containers, o
             </div>
             {customError && <p className="error-text">{customError}</p>}
           </form>
+        </div>
+      )}
+
+      {step === 3 && (
+        <div className="amount-picker">
+          <button className="btn-ghost amount-picker__back" onClick={() => setStep(1)}>
+            ← Volver
+          </button>
+
+          <LargeContainerCard
+            container={activeContainer}
+            onSip={(amountMl) => onSip({ container_id: activeContainer.id, amount_ml: amountMl, drink_type: activeContainer.drink_type })}
+            onRefill={onRefill}
+            submitting={submitting}
+          />
         </div>
       )}
     </BottomSheet>
