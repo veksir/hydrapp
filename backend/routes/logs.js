@@ -1,11 +1,10 @@
 const express = require("express");
 const db = require("../db/init");
 const { requireAuth } = require("../utils/auth-middleware");
-const { buildLogFeedback } = require("../utils/logFeedback");
+const { createWaterLog } = require("../utils/createWaterLog");
 const { getTodayGoalAndStatus } = require("../utils/dailyStatus");
 const { localDateStr, offsetModifier } = require("../utils/time");
-const { DRINK_TYPES, getDrinkFactor, isValidDrinkType } = require("../utils/drinkTypes");
-const { parseUtcTimestamp } = require("../utils/time");
+const { DRINK_TYPES } = require("../utils/drinkTypes");
 const { goalForDate } = require("../utils/historicalGoal");
 
 const router = express.Router();
@@ -98,76 +97,15 @@ router.put("/context/today", (req, res) => {
 router.post("/", (req, res) => {
   try {
     const profile = getProfileOrThrow(req.userId);
-    const { container_id, amount_ml, drink_type } = req.body;
-
-    const finalDrinkType = drink_type && isValidDrinkType(drink_type) ? drink_type : "agua";
-
-    // Si viene container_id, SIEMPRE se valida que sea del usuario —
-    // antes solo se validaba cuando no venía amount_ml, lo que permitía
-    // referenciar recipientes de otros usuarios (IDOR) o un id inexistente
-    // que terminaba tronando la restricción de llave foránea con un 500.
-    let resolvedContainerId = null;
-    if (container_id !== undefined && container_id !== null && container_id !== "") {
-      const container = db
-        .prepare("SELECT * FROM containers WHERE id = ? AND user_id = ?")
-        .get(container_id, req.userId);
-      if (!container) return res.status(404).json({ error: "Recipiente no encontrado" });
-      resolvedContainerId = container.id;
-      if (amount_ml === undefined || amount_ml === null || amount_ml === "") {
-        req.body.amount_ml = container.volume_ml;
-      }
-    }
-
-    let finalAmount = req.body.amount_ml;
-
-    if (!isFiniteNumber(finalAmount) || Number(finalAmount) <= 0) {
-      return res.status(400).json({ error: "amount_ml o container_id válido son requeridos" });
-    }
-    finalAmount = Number(finalAmount);
-
-    // Ningún ser humano toma más de esto de una sola vez — si pasa, es casi
-    // seguro un error de tipeo (ej. escribir 20000 en vez de 200). Mejor
-    // rechazarlo con un mensaje claro que dejarlo pasar en silencio.
-    const MAX_SINGLE_LOG_ML = 3000;
-    if (finalAmount > MAX_SINGLE_LOG_ML) {
-      return res.status(400).json({
-        error: `${finalAmount}ml no es realista para un solo registro (máximo ${MAX_SINGLE_LOG_ML}ml). Si tomaste más, regístralo en varias veces.`,
-      });
-    }
-    const effectiveAmount = Math.round(finalAmount * getDrinkFactor(finalDrinkType));
-
-    // Estado ANTES de insertar, para poder decir "acabas de cruzar tu meta"
-    const before = getTodayGoalAndStatus(req.userId, profile);
-
-    const result = db
-      .prepare(
-        "INSERT INTO water_logs (user_id, container_id, amount_ml, drink_type, effective_ml) VALUES (?, ?, ?, ?, ?)"
-      )
-      .run(req.userId, resolvedContainerId, finalAmount, finalDrinkType, effectiveAmount);
-
-    const log = db.prepare("SELECT * FROM water_logs WHERE id = ?").get(result.lastInsertRowid);
-
-    const after = getTodayGoalAndStatus(req.userId, profile);
-
-    const RECENT_WINDOW_MS = 10 * 60 * 1000;
-    const nowMs = Date.now();
-    const recentLogs = after.todayLogs.filter((l) => nowMs - parseUtcTimestamp(l.logged_at) <= RECENT_WINDOW_MS);
-    const recentBurstMl = recentLogs.reduce((s, l) => s + l.amount_ml, 0);
-    const oldestRecentMs = recentLogs.length
-      ? Math.min(...recentLogs.map((l) => parseUtcTimestamp(l.logged_at)))
-      : nowMs;
-    const recentBurstMinutes = Math.round((nowMs - oldestRecentMs) / 60000);
-
-    const feedback = buildLogFeedback({
-      amountJustLoggedMl: finalAmount, // el aviso de "de golpe" mira el volumen físico real
-      consumedTodayMl: after.consumedMl,
-      goalMl: after.goal.total_ml,
-      previousConsumedTodayMl: before.consumedMl,
-      recentBurstMl,
-      recentBurstMinutes,
+    const { log, feedback, consumedMl, goalMl } = createWaterLog({
+      userId: req.userId,
+      profile,
+      container_id: req.body.container_id,
+      amount_ml: req.body.amount_ml,
+      drink_type: req.body.drink_type,
     });
 
-    res.status(201).json({ log, feedback, consumed_ml: after.consumedMl, goal_ml: after.goal.total_ml });
+    res.status(201).json({ log, feedback, consumed_ml: consumedMl, goal_ml: goalMl });
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message });
   }

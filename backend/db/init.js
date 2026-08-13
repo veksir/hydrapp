@@ -37,7 +37,11 @@ CREATE TABLE IF NOT EXISTS containers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  volume_ml REAL NOT NULL,
+  volume_ml REAL NOT NULL, -- capacidad total del recipiente (volumen calibrado)
+  container_type TEXT NOT NULL DEFAULT 'custom', -- custom | thermos | pitcher | dispenser
+  drink_type TEXT NOT NULL DEFAULT 'agua', -- qué contiene habitualmente (agua, cafe, te, jugo...)
+  current_volume REAL NOT NULL DEFAULT 0, -- volumen restante hoy (para recipientes grandes con seguimiento parcial)
+  last_reset_date TEXT, -- YYYY-MM-DD del último llenado/reinicio diario (zona horaria del usuario)
   created_at TEXT DEFAULT (datetime('now'))
 );
 
@@ -117,6 +121,32 @@ if (!existingLogColumns.includes("effective_ml")) {
 const existingContextColumns = db.prepare("PRAGMA table_info(daily_context)").all().map((c) => c.name);
 if (!existingContextColumns.includes("activity_is_live")) {
   db.exec("ALTER TABLE daily_context ADD COLUMN activity_is_live INTEGER NOT NULL DEFAULT 0");
+}
+
+// Recipientes de gran capacidad (>3000ml): seguimiento parcial del volumen
+// restante con reinicio diario automático. Un termo de 4L no se registra de
+// una sola vez (antes rebotaba contra el límite de "un solo registro"), sino
+// con tomas parciales que descuentan del restante. Migración ligera: si la
+// columna no existe (recipientes de una versión anterior), se agrega y los
+// recipientes existentes arrancan llenos hoy para no cambiarles el
+// comportamiento.
+const existingContainerColumns = db.prepare("PRAGMA table_info(containers)").all().map((c) => c.name);
+if (!existingContainerColumns.includes("container_type")) {
+  db.exec("ALTER TABLE containers ADD COLUMN container_type TEXT NOT NULL DEFAULT 'custom'");
+}
+if (!existingContainerColumns.includes("current_volume")) {
+  db.exec("ALTER TABLE containers ADD COLUMN current_volume REAL NOT NULL DEFAULT 0");
+}
+if (!existingContainerColumns.includes("last_reset_date")) {
+  db.exec("ALTER TABLE containers ADD COLUMN last_reset_date TEXT");
+  // Los recipientes ya calibrados arrancan llenos hoy; el auto-reset diario
+  // los deja así a partir de mañana sin intervención.
+  db.exec(
+    "UPDATE containers SET current_volume = volume_ml, last_reset_date = date('now', 'localtime')"
+  );
+}
+if (!existingContainerColumns.includes("drink_type")) {
+  db.exec("ALTER TABLE containers ADD COLUMN drink_type TEXT NOT NULL DEFAULT 'agua'");
 }
 
 module.exports = db;
