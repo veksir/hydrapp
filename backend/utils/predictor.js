@@ -172,7 +172,11 @@ function getHydrationStatus({
       `y retoma tu ritmo normal — no intentes recuperar todo de una sola vez.`;
   } else if (deficit > atrasadoThreshold) {
     status = "atrasado";
-    message = `Estás un poco atrasado (${Math.round(deficit)}ml). Un vaso de agua ahora te pone al día.`;
+    // Alineado con el marco de recuperación gradual de muy_atrasado: un
+    // vaso acerca, no promete ponerte al día de golpe (podría sobre-vender
+    // cuando el déficit supera el tamaño de un vaso y el mensaje insistiría
+    // con "atrasado" tras tomarlo).
+    message = `Estás un poco atrasado (${Math.round(deficit)}ml). Un vaso ahora te acerca — sigue registrando.`;
   } else if (deficit < -adelantadoThreshold) {
     status = "adelantado";
     message = "Vas muy bien, incluso adelantado a tu meta de este momento.";
