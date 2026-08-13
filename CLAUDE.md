@@ -93,7 +93,9 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   día más cercano aunque la columna mida solo ~10px con 30 días en la gráfica),
   **guía vertical** + punto agrandado en el día activo (feedback visual de qué
   día quedó seleccionado) y **scrub**: mantener y deslizar el dedo recorre el
-  detalle día a día en vivo. `touch-action: none` en el SVG evita que el
+  detalle día a día en vivo; al soltar, la selección queda fijada en ese día
+  (el `pointerleave` al levantar el dedo no la borra, solo el mouse la limpia).
+  `touch-action: none` en el SVG evita que el
   scroll de la página robe el gesto. El dibujo visual no cambió (punto de
   2.5px, 6px al activo) y el hover del mouse se conserva vía los mismos
   pointer events.

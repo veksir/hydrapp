@@ -81,7 +81,11 @@ export default function HistoryChart({ rows }) {
           resolveHover(e);
         }}
         onPointerMove={resolveHover}
-        onPointerLeave={() => setHover(null)}
+        onPointerLeave={(e) => {
+          // En touch, soltar el dedo dispara pointerleave (el puntero deja de
+          // existir); no hay que limpiar el hover o la selección se borra sola.
+          if (e.pointerType !== "touch") setHover(null);
+        }}
       >
         {activePoint && (
           <line
