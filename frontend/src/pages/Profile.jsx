@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { pushSupported, getPushSubscriptionStatus, subscribeToPush, unsubscribeFromPush, getPushUnavailableReason } from "../push";
 import { MapPin, Sun, Moon, MonitorSmartphone } from "lucide-react";
+import ContainerForm from "../components/ContainerForm";
 
 const THEME_OPTIONS = [
   { id: "light", label: "Claro", icon: Sun },
@@ -27,7 +28,8 @@ export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [containers, setContainers] = useState([]);
   const [form, setForm] = useState(null);
-  const [newContainer, setNewContainer] = useState({ name: "", volume_ml: "" });
+  const [newContainer, setNewContainer] = useState({ name: "", volume_ml: "", container_type: "custom", drink_type: "agua" });
+  const [editingContainerId, setEditingContainerId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -138,15 +140,41 @@ export default function Profile() {
       return;
     }
     try {
-      const created = await api.addContainer({
+      const payload = {
         name: newContainer.name,
         volume_ml: Number(newContainer.volume_ml),
-      });
-      setContainers((c) => [...c, created]);
-      setNewContainer({ name: "", volume_ml: "" });
+        container_type: newContainer.container_type,
+        drink_type: newContainer.drink_type,
+      };
+      if (editingContainerId) {
+        const updated = await api.updateContainer(editingContainerId, payload);
+        setContainers((cs) => cs.map((c) => (c.id === editingContainerId ? updated : c)));
+        setEditingContainerId(null);
+      } else {
+        const created = await api.addContainer(payload);
+        setContainers((c) => [...c, created]);
+      }
+      setNewContainer({ name: "", volume_ml: "", container_type: "custom", drink_type: "agua" });
     } catch (err) {
       setError(err.message);
     }
+  }
+
+  function startEditContainer(c) {
+    setError("");
+    setEditingContainerId(c.id);
+    setNewContainer({
+      name: c.name,
+      volume_ml: String(c.volume_ml),
+      container_type: c.container_type || "custom",
+      drink_type: c.drink_type || "agua",
+    });
+  }
+
+  function cancelEditContainer() {
+    setEditingContainerId(null);
+    setError("");
+    setNewContainer({ name: "", volume_ml: "", container_type: "custom", drink_type: "agua" });
   }
 
   async function removeContainer(id) {
@@ -283,10 +311,22 @@ export default function Profile() {
           <ul className="container-list">
             {containers.map((c) => (
               <li key={c.id} className="container-list__item">
-                <span>{c.name} · {c.volume_ml}ml</span>
-                <button className="btn-ghost" onClick={() => removeContainer(c.id)} type="button">
-                  Eliminar
-                </button>
+                <div className="container-list__meta">
+                  <span className="container-list__name">
+                    {c.name} · {c.volume_ml}ml
+                    {c.container_type && c.container_type !== "custom" && (
+                      <span className="container-list__tag">toma parcial</span>
+                    )}
+                  </span>
+                </div>
+                <div className="container-list__actions">
+                  <button className="btn-ghost" onClick={() => startEditContainer(c)} type="button">
+                    Editar
+                  </button>
+                  <button className="btn-ghost" onClick={() => removeContainer(c.id)} type="button">
+                    Eliminar
+                  </button>
+                </div>
               </li>
             ))}
           </ul>
@@ -294,19 +334,18 @@ export default function Profile() {
           <p className="setup-hint">Todavía no tienes recipientes calibrados.</p>
         )}
 
-        <form onSubmit={addContainer} className="setup-form" style={{ padding: 0 }}>
-          <div className="field-row">
-            <div className="field">
-              <label htmlFor="p-cname">Nombre</label>
-              <input id="p-cname" placeholder="Ej: Mi termo" value={newContainer.name} onChange={(e) => setNewContainer((c) => ({ ...c, name: e.target.value }))} />
-            </div>
-            <div className="field">
-              <label htmlFor="p-cvol">Volumen (ml)</label>
-              <input id="p-cvol" type="number" min="1" value={newContainer.volume_ml} onChange={(e) => setNewContainer((c) => ({ ...c, volume_ml: e.target.value }))} />
-            </div>
-          </div>
-          <button className="btn-ghost" type="submit">+ Agregar recipiente</button>
-        </form>
+        <ContainerForm
+          value={newContainer}
+          onChange={(patch) => setNewContainer((c) => ({ ...c, ...patch }))}
+          onSubmit={addContainer}
+          submitLabel={editingContainerId ? "Guardar cambios" : "+ Agregar recipiente"}
+          submitClass={editingContainerId ? "btn-primary" : "btn-ghost"}
+          formStyle={{ padding: 0 }}
+          fieldsInline
+          editing={Boolean(editingContainerId)}
+          onCancelEdit={cancelEditContainer}
+          error={error}
+        />
       </div>
 
       <div className="card setup-form">

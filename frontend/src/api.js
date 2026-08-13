@@ -61,7 +61,10 @@ export const api = {
 
   getContainers: () => request("/containers"),
   addContainer: (payload) => request("/containers", { method: "POST", body: payload }),
+  updateContainer: (id, payload) => request(`/containers/${id}`, { method: "PUT", body: payload }),
   deleteContainer: (id) => request(`/containers/${id}`, { method: "DELETE" }),
+  sipContainer: (id, payload) => request(`/containers/${id}/sip`, { method: "POST", body: payload }),
+  refillContainer: (id) => request(`/containers/${id}/refill`, { method: "PUT" }),
 
   getToday: () => request("/logs/today"),
   logWater: (payload) => request("/logs", { method: "POST", body: payload }),

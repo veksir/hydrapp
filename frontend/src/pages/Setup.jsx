@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { getCurrentWeather } from "../weather";
 import { MapPin } from "lucide-react";
+import ContainerForm from "../components/ContainerForm";
 
 export default function Setup() {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ export default function Setup() {
   });
 
   const [containers, setContainers] = useState([]);
-  const [newContainer, setNewContainer] = useState({ name: "", volume_ml: "", refObject: "manual", heightCm: "" });
+  const [newContainer, setNewContainer] = useState({ name: "", volume_ml: "", container_type: "custom", drink_type: "agua", refObject: "manual", heightCm: "" });
 
   useEffect(() => {
     api.getContainers().then(setContainers).catch(() => {});
@@ -84,9 +85,11 @@ export default function Setup() {
       const created = await api.addContainer({
         name: newContainer.name,
         volume_ml: Number(newContainer.volume_ml),
+        container_type: newContainer.container_type,
+        drink_type: newContainer.drink_type,
       });
       setContainers((c) => [...c, created]);
-      setNewContainer({ name: "", volume_ml: "", refObject: "manual", heightCm: "" });
+      setNewContainer({ name: "", volume_ml: "", container_type: "custom", drink_type: "agua", refObject: "manual", heightCm: "" });
     } catch (err) {
       setError(err.message);
     }
@@ -226,28 +229,29 @@ export default function Setup() {
               perfil.
             </p>
 
-            <form onSubmit={addContainer} className="setup-form">
-              <div className="field">
-                <label htmlFor="cname">Nombre del recipiente</label>
-                <input id="cname" placeholder="Ej: Mi vaso de la oficina" value={newContainer.name} onChange={(e) => setNewContainer((c) => ({ ...c, name: e.target.value }))} />
-              </div>
-
+            <ContainerForm
+              value={newContainer}
+              onChange={(patch) => setNewContainer((c) => ({ ...c, ...patch }))}
+              onSubmit={addContainer}
+              submitLabel="Guardar recipiente"
+              error={error}
+            >
               <div className="field">
                 <label htmlFor="cheight">Altura del agua (cm) — opcional, para estimar</label>
                 <div className="field-with-button">
-                  <input id="cheight" type="number" min="0" value={newContainer.heightCm} onChange={(e) => setNewContainer((c) => ({ ...c, heightCm: e.target.value }))} />
-                  <button type="button" className="btn-ghost" onClick={estimateVolume}>Estimar</button>
+                  <input
+                    id="cheight"
+                    type="number"
+                    min="0"
+                    value={newContainer.heightCm}
+                    onChange={(e) => setNewContainer((c) => ({ ...c, heightCm: e.target.value }))}
+                  />
+                  <button type="button" className="btn-ghost" onClick={estimateVolume}>
+                    Estimar
+                  </button>
                 </div>
               </div>
-
-              <div className="field">
-                <label htmlFor="cvol">Volumen (ml)</label>
-                <input id="cvol" type="number" min="1" required value={newContainer.volume_ml} onChange={(e) => setNewContainer((c) => ({ ...c, volume_ml: e.target.value }))} />
-              </div>
-
-              {error && <p className="error-text">{error}</p>}
-              <button className="btn-primary" type="submit">Guardar recipiente</button>
-            </form>
+            </ContainerForm>
           </div>
 
           {containers.length > 0 && (
