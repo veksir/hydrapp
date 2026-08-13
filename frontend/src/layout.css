@@ -102,6 +102,38 @@
 }
 .field-row .field { flex: 1; min-width: 0; }
 
+/* En nombres largos + volumen, el par no se estruja: cada campo se va a su
+   propia línea. */
+@media (max-width: 380px) {
+  .field-row {
+    flex-direction: column;
+  }
+}
+
+.field-col {
+  width: 100%;
+}
+
+.container-content-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.container-content-select__icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--primary);
+}
+
+.container-form-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.container-form-actions > * {
+  flex: 1;
+}
+
 .field-with-button {
   display: flex;
   gap: 8px;
@@ -137,7 +169,56 @@
   padding: 12px 16px;
   display: flex;
   justify-content: space-between;
+  gap: 12px;
+  align-items: center;
   font-weight: 500;
+}
+
+.container-list__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.container-list__name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.container-list__tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--primary-tint);
+  color: var(--primary-deep);
+  white-space: nowrap;
+}
+
+.container-list__actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.container-list__actions .btn-ghost {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* En pantallas muy angostas la fila se apila en vez de estrujar los botones
+   a la derecha del nombre. */
+@media (max-width: 420px) {
+  .container-list__item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .container-list__actions {
+    justify-content: flex-end;
+  }
 }
 
 .container-list__vol {
