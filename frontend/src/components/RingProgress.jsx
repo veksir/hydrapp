@@ -45,7 +45,7 @@ function useCountUp(target, duration = 650) {
   return display;
 }
 
-export default function RingProgress({ percent, consumedMl, goalMl, tone = "primary" }) {
+export default function RingProgress({ percent, consumedMl, goalMl, tone = "primary", onCelebrate }) {
   const clamped = Math.max(0, Math.min(100, percent));
   const offset = CIRCUMFERENCE - (clamped / 100) * CIRCUMFERENCE;
   const displayMl = useCountUp(Math.round(consumedMl));
@@ -53,15 +53,22 @@ export default function RingProgress({ percent, consumedMl, goalMl, tone = "prim
   const wasComplete = useRef(percent >= 100);
   const [celebrate, setCelebrate] = useState(false);
 
+  // Solo celebra la primera vez que se cruza el 100% (no en cada registro
+  // adicional mientras se sigue por encima de la meta): wasComplete.current
+  // se marca en true de una vez al disparar, no solo cuando NO celebra —
+  // si no, como el efecto se re-ejecuta con cada cambio de percent, un
+  // segundo trago después de cumplir la meta volvía a disparar el pulso.
   useEffect(() => {
     const isComplete = percent >= 100;
     if (isComplete && !wasComplete.current && !prefersReducedMotion()) {
       setCelebrate(true);
+      wasComplete.current = true;
+      onCelebrate?.();
       const t = setTimeout(() => setCelebrate(false), 900);
       return () => clearTimeout(t);
     }
     wasComplete.current = isComplete;
-  }, [percent]);
+  }, [percent, onCelebrate]);
 
   return (
     <div className={`ring-progress ${celebrate ? "ring-progress--celebrate" : ""}`}>

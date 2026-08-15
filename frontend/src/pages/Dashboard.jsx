@@ -10,6 +10,7 @@ import LogDrinkSheet from "../components/LogDrinkSheet";
 import ActivitySheet from "../components/ActivitySheet";
 import CenterAlert from "../components/CenterAlert";
 import { DashboardSkeleton } from "../components/PageSkeletons";
+import Confetti from "../components/Confetti";
 import { MapPin, Wifi } from "lucide-react";
 import { addToOfflineQueue, syncOfflineQueue, isNetworkError, queueLength } from "../offlineQueue";
 
@@ -35,6 +36,7 @@ export default function Dashboard({ user }) {
   const [submitting, setSubmitting] = useState(false);
   const [pendingSync, setPendingSync] = useState(0);
   const [highlightId, setHighlightId] = useState(null);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
     if (location.state?.openLog) {
@@ -225,6 +227,7 @@ export default function Dashboard({ user }) {
 
   return (
     <div className="dashboard">
+      {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
       <header className="dashboard__header">
         <div>
           <p className="dashboard__eyebrow">{new Date().toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" })}</p>
@@ -260,7 +263,13 @@ export default function Dashboard({ user }) {
           onClick={() => setSheetOpen(true)}
           aria-label="Registrar bebida"
         >
-          <RingProgress percent={percent} consumedMl={data.consumed_ml} goalMl={data.goal.total_ml} tone={ringTone} />
+          <RingProgress
+            percent={percent}
+            consumedMl={data.consumed_ml}
+            goalMl={data.goal.total_ml}
+            tone={ringTone}
+            onCelebrate={() => setShowConfetti(true)}
+          />
         </button>
         <p className="dashboard__message">{data.hydration.message}</p>
         {data.consumed_ml === 0 && (

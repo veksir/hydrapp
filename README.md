@@ -108,7 +108,6 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 **Pendiente de esta pasada de diseño:**
 - Onboarding paso a paso (el flujo actual sigue siendo un formulario en 2 pasos, no los 6 pasos cortos del concepto).
 - Pantalla de "Perfil" como resumen (hoy el ícono de perfil en el nav va directo al formulario de edición, no a una vista de resumen).
-- Confeti/anillo que cambia de color al completar la meta más allá del color base (la vibración háptica ya está implementada, ver sección 7).
 - Gráficas/sparklines reales en Insights (Historial ya las tiene, ver sección 10).
 - Transiciones entre pantallas de la navegación.
 
@@ -116,6 +115,7 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 > Modo oscuro: **cerrado**, ver sección 10 de este README.
 > Contraste de verdes (WCAG AA): **cerrado**, ver CLAUDE.md.
 > Skeletons/shimmer en estados de carga: **cerrado**, ver CLAUDE.md.
+> Confeti al cumplir la meta: **cerrado**, ver CLAUDE.md (el cambio de color del anillo ya estaba implementado desde antes).
 
 **Modo oscuro (hecho):** ver sección 10.
 
@@ -232,7 +232,7 @@ Bugs encontrados usando la app, no solo leyendo código:
 - Balance de electrolitos (sodio/potasio/magnesio).
 
 > Asistente conversacional (Groq) ya implementado, ver sección 1 (Backend → "Asistente conversacional (Groq)").
-> Vibración háptica ya implementada, ver sección 7. Confeti sigue pendiente, ver "Pendiente de esta pasada de diseño".
+> Vibración háptica ya implementada, ver sección 7. Confeti ya implementado, ver "Pendiente de esta pasada de diseño" (nota de cierre) y CLAUDE.md.
 
 ## 9. Deuda técnica conocida (documentada a propósito)
 

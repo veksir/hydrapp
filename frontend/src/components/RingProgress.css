@@ -46,9 +46,13 @@
   100% { transform: scale(1); }
 }
 @keyframes ring-glow {
-  0% { filter: drop-shadow(0 0 0 rgba(73, 194, 122, 0)); }
-  40% { filter: drop-shadow(0 0 10px rgba(73, 194, 122, 0.55)); }
-  100% { filter: drop-shadow(0 0 0 rgba(73, 194, 122, 0)); }
+  /* rgb(42,126,76) = --success actual (#2A7E4C, ajustado a WCAG AA).
+     Se hardcodea porque drop-shadow no puede leer un color y variar solo
+     su opacidad vía var() en un keyframe; si --success cambia, actualizar
+     acá también. */
+  0% { filter: drop-shadow(0 0 0 rgba(42, 126, 76, 0)); }
+  40% { filter: drop-shadow(0 0 10px rgba(42, 126, 76, 0.55)); }
+  100% { filter: drop-shadow(0 0 0 rgba(42, 126, 76, 0)); }
 }
 
 @media (prefers-reduced-motion: reduce) {

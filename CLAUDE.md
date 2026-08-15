@@ -307,6 +307,55 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   simulando red lenta (throttling) para ver el shimmer con tiempo.
 - **Commit:** pendiente (branch `feat/skeletons-carga`).
 
+### Confeti al cumplir la meta del día
+- **Estado previo:** el ítem de backlog decía "Confeti/anillo que cambia
+  de color al completar la meta", pero la parte del anillo ya estaba
+  hecha (`RingProgress` ya pone `tone="success"` al llegar a 100% y ya
+  tenía un pulso/glow de celebración) — lo único que faltaba de verdad
+  era el confeti.
+- **Componente nuevo:** `frontend/src/components/Confetti.jsx` +
+  `Confetti.css` — sin librería externa ni canvas, ~24 `div` con
+  `position: fixed` cayendo vía CSS keyframes (posición horizontal,
+  delay, duración, rotación y deriva lateral aleatorios, generados una
+  sola vez con `useState(buildPieces)` para que no salten de posición
+  durante la animación), coloreados con los tokens de marca (`--primary`,
+  `--secondary`, `--success`, `--warning`) para que se vean bien en
+  claro/oscuro sin lógica extra. Se desmonta solo (`onDone` a los
+  1700ms). `pointer-events: none` y `z-index: 80` (por encima de
+  `ConfirmDialog`, que es el overlay más alto existente en 70) para que
+  no bloquee ningún click mientras cae.
+- **Disparo:** `RingProgress` ganó un prop `onCelebrate`, llamado desde
+  el mismo efecto que ya detectaba "se acaba de cruzar el 100%" (para el
+  pulso/glow). `Dashboard` lo usa para montar `<Confetti>`. Como
+  `onCelebrate` nunca se llama bajo `prefers-reduced-motion` (mismo
+  guard que ya tenía el pulso), el confeti tampoco se monta en ese caso
+  — no hizo falta duplicar el chequeo.
+- **Bug de paso, arreglado en el mismo archivo:** el `useRef` que evita
+  re-celebrar (`wasComplete`) solo se actualizaba cuando el `if` de
+  celebración NO se cumplía — así que al cruzar el 100% quedaba en
+  `false` para siempre, y cada registro adicional mientras se seguía por
+  encima de la meta volvía a disparar el pulso/glow (y ahora habría
+  vuelto a disparar el confeti también). Se corrigió marcando
+  `wasComplete.current = true` en el momento de celebrar, no solo en la
+  rama contraria — ahora celebra una sola vez por vez que se cruza la
+  meta (vuelve a poder celebrar si el porcentaje baja de 100% y sube de
+  nuevo, ej. al otro día).
+- **Deuda menor arreglada de paso:** el glow de celebración tenía
+  `rgba(73, 194, 122, ...)` (el `--success` viejo, de antes del fix de
+  contraste WCAG) hardcodeado en `RingProgress.css` — quedó huérfano
+  porque ese fix solo tocó `index.css`. Se actualizó a `rgba(42, 126,
+  76, ...)`, el `--success` actual, con un comentario explicando por qué
+  está hardcodeado en vez de usar la variable (drop-shadow no puede leer
+  un color CSS var y variar solo su opacidad en un keyframe).
+- **Verificado:** `npm run build` limpio, `oxlint` sin warnings nuevos
+  (10 preexistentes, los mismos 4 de siempre en `Dashboard.jsx` con
+  números de línea corridos por el código agregado arriba). Pendiente:
+  revisión visual manual de Kevin — completar la meta del día en
+  claro/oscuro y confirmar que el confeti se ve bien, no se repite en
+  registros posteriores, y no aparece con `prefers-reduced-motion`
+  activado.
+- **Commit:** pendiente (branch `feat/confeti-meta-cumplida`).
+
 ## Pendiente
 
 Consolidado desde el README (que tenía ítems ya cerrados mezclados con
@@ -326,8 +375,6 @@ cerrar cada ítem, moviéndolo a "Bugs resueltos" o "Features cerrados".
   formulario largo en 2 pasos.
 - Pantalla "Perfil" como resumen — hoy el ícono de perfil en el nav va
   directo al formulario de edición, no a una vista de resumen.
-- Confeti/anillo que cambia de color al completar la meta (la vibración
-  háptica ya está implementada, ver README sección 7).
 - Sparklines/gráficas reales en **Insights** (Historial ya las tiene desde
   el feature de calendario/gráfica de tendencia).
 - Transiciones entre pantallas de la navegación.
