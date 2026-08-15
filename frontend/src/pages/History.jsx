@@ -3,6 +3,7 @@ import { List, CalendarDays } from "lucide-react";
 import { api } from "../api";
 import HistoryCalendar from "../components/HistoryCalendar";
 import HistoryChart from "../components/HistoryChart";
+import { HistorySkeleton } from "../components/PageSkeletons";
 
 const LIST_DAYS = 14;
 const CALENDAR_DAYS = 90; // máximo que soporta el backend, permite navegar varios meses atrás
@@ -16,7 +17,7 @@ export default function History() {
     api.getHistory(CALENDAR_DAYS).then(setRows).finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="screen-center">Cargando historial...</div>;
+  if (loading) return <HistorySkeleton />;
 
   const hasAnyData = rows.some((r) => r.entries > 0);
   const listRows = rows.slice(-LIST_DAYS);

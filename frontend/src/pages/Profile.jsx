@@ -7,6 +7,7 @@ import { useTheme } from "../context/ThemeContext";
 import { pushSupported, getPushSubscriptionStatus, subscribeToPush, unsubscribeFromPush, getPushUnavailableReason } from "../push";
 import { MapPin, Sun, Moon, MonitorSmartphone } from "lucide-react";
 import ContainerForm from "../components/ContainerForm";
+import { ProfileSkeleton } from "../components/PageSkeletons";
 
 const THEME_OPTIONS = [
   { id: "light", label: "Claro", icon: Sun },
@@ -197,7 +198,7 @@ export default function Profile() {
     }
   }
 
-  if (loading) return <div className="screen-center">Cargando tu perfil...</div>;
+  if (loading) return <ProfileSkeleton />;
   if (!form) return null;
 
   return (

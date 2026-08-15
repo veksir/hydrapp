@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { Thermometer } from "lucide-react";
+import { InsightsSkeleton } from "../components/PageSkeletons";
 
 export default function Insights() {
   const [data, setData] = useState(null);
@@ -11,7 +12,7 @@ export default function Insights() {
     api.getInsights().then(setData).catch((err) => setError(err.message)).finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="screen-center">Cargando insights...</div>;
+  if (loading) return <InsightsSkeleton />;
   if (error) return <div className="screen-center error-text">{error}</div>;
 
   return (

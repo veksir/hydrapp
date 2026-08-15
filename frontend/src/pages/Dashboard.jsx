@@ -9,6 +9,7 @@ import EducationCapsule from "../components/EducationCapsule";
 import LogDrinkSheet from "../components/LogDrinkSheet";
 import ActivitySheet from "../components/ActivitySheet";
 import CenterAlert from "../components/CenterAlert";
+import { DashboardSkeleton } from "../components/PageSkeletons";
 import { MapPin, Wifi } from "lucide-react";
 import { addToOfflineQueue, syncOfflineQueue, isNetworkError, queueLength } from "../offlineQueue";
 
@@ -215,7 +216,7 @@ export default function Dashboard({ user }) {
     }
   }
 
-  if (loading) return <div className="screen-center">Cargando tu progreso...</div>;
+  if (loading) return <DashboardSkeleton />;
   if (error) return <div className="screen-center error-text">{error}</div>;
   if (!data) return null;
 

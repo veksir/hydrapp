@@ -280,6 +280,33 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   `68fe55c` (styles), `2279a8a` (tomas parciales sheet), `2c0de99`
   (ConfirmDialog + cierre sheet) — 2026-08-13.
 
+### Skeletons/shimmer en estados de carga
+- **Componentes nuevos:** `frontend/src/components/Skeleton.jsx` (primitivos
+  `SkeletonBlock`, `SkeletonCircle`, `SkeletonGroup` — bloque con gradiente
+  animado usando `--surface-sunk`/`--border`, así que funciona igual en
+  claro/oscuro sin código extra) + `Skeleton.css` (keyframe del shimmer,
+  respeta `prefers-reduced-motion`). `PageSkeletons.jsx` compone esos
+  primitivos en una silueta por página: `DashboardSkeleton`,
+  `HistorySkeleton`, `InsightsSkeleton`, `ProfileSkeleton`,
+  `AssistantSkeleton`. Reutilizan las clases de layout reales (`.card`,
+  `.dashboard__header`, `.insights-grid`...) para que el espaciado
+  coincida con el contenido que reemplazan y no haya salto al cargar —
+  no son un clon pixel-perfect de cada pantalla, solo una referencia de
+  forma.
+- **Reemplazado:** los 5 `if (loading) return <div className="screen-center">
+  Cargando...</div>` de texto plano, uno por página (`Dashboard`,
+  `History`, `Insights`, `Profile`, `Assistant`).
+- **Accesibilidad:** cada `SkeletonGroup` es `role="status"` con un
+  `aria-label` (ej. "Cargando tu progreso") para que un lector de
+  pantalla lo anuncie una sola vez; los bloques individuales llevan
+  `aria-hidden` por ser decorativos.
+- **Verificado:** `npm run build` limpio, `oxlint` sin warnings nuevos (10
+  preexistentes en `AuthContext`/`ThemeContext`/`drinkIcons`/`Dashboard`/
+  `Profile`, ninguno en los archivos tocados por este cambio). Pendiente:
+  revisión visual manual de Kevin en las 5 pantallas, claro y oscuro,
+  simulando red lenta (throttling) para ver el shimmer con tiempo.
+- **Commit:** pendiente (branch `feat/skeletons-carga`).
+
 ## Pendiente
 
 Consolidado desde el README (que tenía ítems ya cerrados mezclados con
@@ -303,8 +330,6 @@ cerrar cada ítem, moviéndolo a "Bugs resueltos" o "Features cerrados".
   háptica ya está implementada, ver README sección 7).
 - Sparklines/gráficas reales en **Insights** (Historial ya las tiene desde
   el feature de calendario/gráfica de tendencia).
-- Skeletons/shimmer en estados de carga (hoy son mensajes de texto plano
-  tipo "Cargando...").
 - Transiciones entre pantallas de la navegación.
 
 ### Exploratorio (v2, sin comprometer fecha)

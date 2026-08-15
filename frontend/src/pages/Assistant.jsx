@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api";
+import { AssistantSkeleton } from "../components/PageSkeletons";
 
 const SUGGESTIONS = [
   "¿Cuánta agua debería tomar hoy?",
@@ -52,7 +53,7 @@ export default function Assistant() {
     sendMessage(input);
   }
 
-  if (enabled === null) return <div className="screen-center">Cargando...</div>;
+  if (enabled === null) return <AssistantSkeleton />;
 
   if (enabled === false) {
     return (

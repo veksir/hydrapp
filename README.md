@@ -109,13 +109,13 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 - Onboarding paso a paso (el flujo actual sigue siendo un formulario en 2 pasos, no los 6 pasos cortos del concepto).
 - Pantalla de "Perfil" como resumen (hoy el ícono de perfil en el nav va directo al formulario de edición, no a una vista de resumen).
 - Confeti/anillo que cambia de color al completar la meta más allá del color base (la vibración háptica ya está implementada, ver sección 7).
-- Skeletons/shimmer en los estados de carga (hoy son mensajes de texto planos tipo "Cargando...").
 - Gráficas/sparklines reales en Insights (Historial ya las tiene, ver sección 10).
 - Transiciones entre pantallas de la navegación.
 
 > Historial en vista calendario: **cerrado**, ver sección 10 de este README.
 > Modo oscuro: **cerrado**, ver sección 10 de este README.
 > Contraste de verdes (WCAG AA): **cerrado**, ver CLAUDE.md.
+> Skeletons/shimmer en estados de carga: **cerrado**, ver CLAUDE.md.
 
 **Modo oscuro (hecho):** ver sección 10.
 
