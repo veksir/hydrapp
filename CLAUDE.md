@@ -126,7 +126,7 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   nuevos (9 preexistentes, ninguno en archivos tocados — el cambio es
   puramente CSS). Pendiente: revisión visual manual de Kevin en
   Dashboard/Historial/Perfil en claro y oscuro.
-- **Commit:** pendiente (branch `fix/wcag-contraste-verde`).
+- **Commit:** `09f17a5` — 2026-08-13 (branch `fix/wcag-contraste-verde`, mergeada a main).
 
 ### 6. Botón "Registrar" estiraba la sección hacia la derecha en el sheet (y la vista quedaba "corrida")
 - **Archivos:** `frontend/src/components/LogDrinkSheet.css`, `LogDrinkSheet.jsx`, `BottomSheet.jsx`.
@@ -183,7 +183,7 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   ninguno tocado por este cambio). Pendiente: revisión visual manual de
   Kevin registrando un recipiente de cada tipo con altura real y
   comparando el ml estimado contra el envase físico.
-- **Commit:** pendiente (branch `fix/estimador-volumen-por-tipo`).
+- **Commit:** `9fa03a3` — 2026-08-14 (branch `fix/estimador-volumen-por-tipo`, mergeada a main).
 
 ## Features cerrados
 
@@ -275,10 +275,10 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   400. **Frontend:** `npm run build` limpio, `oxlint` sin warnings nuevos
   (10 pre-existentes). Prueba manual de Kevin: pendiente de sesión final en
   celular (layout del Perfil y sheet con >2 recipientes).
-- **Estado:** en branch `feat/recipientes-gran-capacidad` (5 commits,
-  sin mergear a main): `f48bbf7` (backend), `c26600b` (edición frontend),
-  `68fe55c` (styles), `2279a8a` (tomas parciales sheet), `2c0de99`
-  (ConfirmDialog + cierre sheet) — 2026-08-13.
+- **Estado:** mergeada a main. Commits de la branch
+  `feat/recipientes-gran-capacidad`: `f48bbf7` (backend), `c26600b`
+  (edición frontend), `68fe55c` (styles), `2279a8a` (tomas parciales
+  sheet), `2c0de99` (ConfirmDialog + cierre sheet) — 2026-08-13.
 
 ### Skeletons/shimmer en estados de carga
 - **Componentes nuevos:** `frontend/src/components/Skeleton.jsx` (primitivos
@@ -305,7 +305,7 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   `Profile`, ninguno en los archivos tocados por este cambio). Pendiente:
   revisión visual manual de Kevin en las 5 pantallas, claro y oscuro,
   simulando red lenta (throttling) para ver el shimmer con tiempo.
-- **Commit:** pendiente (branch `feat/skeletons-carga`).
+- **Commit:** `19e744e` — 2026-08-14 (branch `feat/skeletons-carga`, mergeada a main).
 
 ### Confeti al cumplir la meta del día
 - **Estado previo:** el ítem de backlog decía "Confeti/anillo que cambia
@@ -354,7 +354,7 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   claro/oscuro y confirmar que el confeti se ve bien, no se repite en
   registros posteriores, y no aparece con `prefers-reduced-motion`
   activado.
-- **Commit:** pendiente (branch `feat/confeti-meta-cumplida`).
+- **Commit:** `233f836` — 2026-08-14 (branch `feat/confeti-meta-cumplida`, mergeada a main).
 
 ## Pendiente
 
