@@ -237,7 +237,7 @@ Bugs encontrados usando la app, no solo leyendo código:
 ## 9. Deuda técnica conocida (documentada a propósito)
 
 - **JWT sin refresh ni rotación**: el token dura 14 días y no hay forma de revocarlo del lado del servidor si se roba. Aceptable para una app de este tamaño; si crece, valdría la pena una tabla de sesiones o tokens de corta duración + refresh token.
-- **Estimador de volumen por altura** (`Setup.jsx`) usa un diámetro fijo de 7cm — es un puente documentado hacia la estimación por foto real (v2), no una medición precisa.
+- **Estimador de volumen por altura** (`Setup.jsx`) usa un diámetro de referencia típico por tipo de recipiente (vaso/termo/jarra/botellón) — es un puente documentado hacia la estimación por foto real (v2), no una medición precisa.
 
 ## 10. Modo oscuro e historial en calendario
 

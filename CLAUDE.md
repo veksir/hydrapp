@@ -159,6 +159,32 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
 - **Verificado:** escenarios forzados en local — muy atrasado (defícit 1764ml → "Registra un vaso ahora y retoma tu ritmo normal — no intentes recuperar todo de una sola vez."), atrasado (déficit 518ml → "Estás un poco atrasado (518ml). Un vaso ahora te acerca — sigue registrando.") y sed probable (mensaje original, sin cambios); backend carga sin errores.
 - **Commit:** `0615039` — 2026-08-13 (branch `fix/ponerse-al-dia-sin-atracón`, mergeada a main). Ajuste posterior alinear `atrasado` (y español neutro): `de2c970` (branch `fix/alinear-atrasado-y-espacio-neutral`, mergeada a main).
 
+### 11. Estimador de volumen por altura usaba el mismo diámetro (7cm) para cualquier tipo de recipiente
+- **Archivo:** `frontend/src/pages/Setup.jsx` (función `estimateVolume`).
+- **Problema:** la calibración por altura (paso 2 del setup, botón "Estimar")
+  aproxima el recipiente como un cilindro y necesita un diámetro de
+  referencia porque el usuario solo mide la altura. Ese diámetro estaba
+  fijo en 7cm (típico de un vaso) sin importar el `container_type`
+  elegido. Para `thermos` era razonable, pero para `pitcher` (jarra) y
+  `dispenser` (botellón/garrafa) — que son justamente los tipos con
+  tomas parciales pensados para volúmenes grandes — subestimaba mucho:
+  un botellón de 25cm de altura estimaba ~962ml en vez de un volumen
+  realista de varios litros.
+- **Fix aplicado:** diámetro de referencia por tipo (`custom` 7cm,
+  `thermos` 7.5cm, `pitcher` 12cm, `dispenser` 18cm) en un mapa
+  `REFERENCE_DIAMETER_CM`, con fallback a `custom` si el tipo no está
+  mapeado. Siguen siendo aproximaciones típicas, no medidas reales — el
+  mismo puente hacia la visión por cámara de v2 que ya existía, solo que
+  ahora varía según el tipo en vez de asumir un vaso para todo. No se
+  tocó `Profile.jsx`: no tiene esta calibración por altura (solo `Setup`
+  la ofrece), así que no había otro lugar con el mismo bug.
+- **Verificado:** `npm run build` limpio, `oxlint` sin warnings nuevos en
+  `Setup.jsx` (los 10 warnings existentes están en otros archivos,
+  ninguno tocado por este cambio). Pendiente: revisión visual manual de
+  Kevin registrando un recipiente de cada tipo con altura real y
+  comparando el ml estimado contra el envase físico.
+- **Commit:** pendiente (branch `fix/estimador-volumen-por-tipo`).
+
 ## Features cerrados
 
 ### Modo oscuro
@@ -280,7 +306,6 @@ cerrar cada ítem, moviéndolo a "Bugs resueltos" o "Features cerrados".
 - Skeletons/shimmer en estados de carga (hoy son mensajes de texto plano
   tipo "Cargando...").
 - Transiciones entre pantallas de la navegación.
-- Estimador de volumen por altura (`Setup.jsx`) usa diámetro fijo de 7cm.
 
 ### Exploratorio (v2, sin comprometer fecha)
 - Estimación de volumen del vaso por foto (visión por cámara).

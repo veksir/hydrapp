@@ -95,15 +95,27 @@ export default function Setup() {
     }
   }
 
+  // Diámetro de referencia por tipo de recipiente para la estimación por
+  // altura (ver estimateVolume). Son aproximaciones típicas, no medidas
+  // reales — el mismo puente hacia la visión por cámara de v2 que ya
+  // existía, pero antes usaba 7cm (diámetro de vaso) para todos los tipos,
+  // lo que subestimaba mucho jarras y botellones (los tipos que más
+  // importa calibrar bien, por ser los de mayor volumen).
+  const REFERENCE_DIAMETER_CM = {
+    custom: 7, // vaso/recipiente normal
+    thermos: 7.5, // termo térmico, similar a un vaso alto
+    pitcher: 12, // jarra
+    dispenser: 18, // botellón / garrafa
+  };
+
   function estimateVolume() {
     // Calibración simple por comparación visual: el usuario mide la altura
-    // de agua útil de su vaso comparándola con un objeto de referencia
-    // conocido, y estima el volumen como un cilindro aproximado usando un
-    // diámetro típico de vaso (7cm) si no lo especifica. Es un puente
-    // razonable hacia la visión por cámara real que vendrá en v2.
+    // de agua útil de su recipiente comparándola con un objeto de
+    // referencia conocido, y estima el volumen como un cilindro
+    // aproximado usando el diámetro típico del tipo de recipiente elegido.
     const h = Number(newContainer.heightCm);
     if (!h) return;
-    const diameterCm = 7;
+    const diameterCm = REFERENCE_DIAMETER_CM[newContainer.container_type] ?? REFERENCE_DIAMETER_CM.custom;
     const radiusCm = diameterCm / 2;
     const volumeMl = Math.round(Math.PI * radiusCm * radiusCm * h);
     setNewContainer((c) => ({ ...c, volume_ml: volumeMl }));
