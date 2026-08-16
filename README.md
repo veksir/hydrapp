@@ -103,7 +103,7 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 - **Íconos vectoriales** (Lucide) en todo el frontend en vez de emojis, para consistencia entre sistemas operativos.
 - **Sombras de elevación** en vez de bordes planos de 1px.
 - **FAB de 46px** (cumple el mínimo de 44px de accesibilidad).
-- **Feedback visual al registrar**: el número del anillo cuenta hacia arriba en vez de saltar al valor nuevo, con un pulso sutil al cruzar el 100% de la meta. La sección "Hoy registraste" se ubica justo debajo del anillo, con un destello breve al aparecer un registro nuevo y un colapso suave al eliminarlo. Con más de 5 registros, la lista se colapsa con "ver N más". Vibración háptica breve en dispositivos compatibles. Todo respeta `prefers-reduced-motion`.
+- **Feedback visual al registrar**: el número del anillo cuenta hacia arriba en vez de saltar al valor nuevo, con un pulso sutil al cruzar el 100% de la meta. El anillo también tiene agua animada subiendo por dentro según el % de la meta (ver CLAUDE.md, idea tomada de una propuesta de diseño en v0.dev). La sección "Hoy registraste" se ubica justo debajo del anillo, con un destello breve al aparecer un registro nuevo y un colapso suave al eliminarlo. Con más de 5 registros, la lista se colapsa con "ver N más". Vibración háptica breve en dispositivos compatibles. Todo respeta `prefers-reduced-motion`.
 
 **Pendiente de esta pasada de diseño:**
 - Onboarding paso a paso (el flujo actual sigue siendo un formulario en 2 pasos, no los 6 pasos cortos del concepto).

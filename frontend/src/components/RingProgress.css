@@ -8,6 +8,33 @@
   transition: stroke-dashoffset 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Grupo de ola: el translateY vertical (nivel del agua, ver
+   RingProgress.jsx) se anima con transición CSS igual que el arco.
+   El translateX horizontal (loop infinito de la ola "corriendo") es
+   aparte, vía keyframes, para que ambos movimientos convivan sin
+   pisarse — ver .ring-progress__wave-x abajo. */
+.ring-progress__wave {
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ring-progress__wave--back path {
+  animation: wave-x-back 7s linear infinite;
+}
+.ring-progress__wave--front path {
+  animation: wave-x-front 4.5s linear infinite reverse;
+}
+
+/* El desplazamiento debe ser igual al ancho del tile de cada ola (ver
+   buildWavePath en RingProgress.jsx: 70px atrás, 55px adelante) para
+   que el loop no se note. */
+@keyframes wave-x-back {
+  from { transform: translateX(0); }
+  to { transform: translateX(-70px); }
+}
+@keyframes wave-x-front {
+  from { transform: translateX(0); }
+  to { transform: translateX(-55px); }
+}
+
 .ring-progress__center {
   position: absolute;
   inset: 0;
@@ -29,7 +56,11 @@
 
 .ring-progress__unit {
   font-size: 13px;
-  color: var(--ink-soft);
+  /* --ink (no --ink-soft): la etiqueta queda encima del relleno de agua
+     (--{tone}-tint) y las olas al 70% de opacidad; el gris soft baja a
+     ~4.2-4.5:1 sobre los tint y se pierde. --ink da ~8:1+ sobre cualquier
+     fondo del anillo sin romper la jerarquía (tamaño/peso la mantienen). */
+  color: var(--ink);
   font-weight: 500;
 }
 
@@ -58,6 +89,10 @@
 @media (prefers-reduced-motion: reduce) {
   .ring-progress--celebrate .ring-progress__amount,
   .ring-progress--celebrate svg {
+    animation: none;
+  }
+  .ring-progress__wave--back path,
+  .ring-progress__wave--front path {
     animation: none;
   }
 }

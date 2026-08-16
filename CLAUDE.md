@@ -356,6 +356,46 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   activado.
 - **Commit:** `233f836` — 2026-08-14 (branch `feat/confeti-meta-cumplida`, mergeada a main).
 
+### Anillo con agua animada (idea tomada de una propuesta de diseño en v0.dev)
+- **Origen:** Kevin compartió un prototipo hecho en v0.dev con ideas de
+  diseño para varias pantallas. Se revisó todo el proyecto (5 pantallas,
+  paleta de colores, tipografía) y se decidió tomar puntualmente el
+  efecto visual del anillo — no el código en sí (stack distinto:
+  Next.js/Tailwind vs Vite/CSS plano de HydrApp) ni la paleta de colores
+  del mockup (su `--warm` fallaba WCAG AA feo, 2.44–2.58:1 como texto —
+  mismo tipo de bug que se arregló acá con `--success` antes). El resto
+  de las ideas de esa propuesta (onboarding paso a paso, perfil resumen,
+  gráficas en Insights) quedan para próximas sesiones, una por vez.
+- **Cambio:** `RingProgress.jsx`/`.css` — el anillo ahora tiene "agua"
+  real subiendo adentro (dos capas de ondas SVG con `Q` curves,
+  animadas horizontalmente en loop y trasladadas verticalmente según el
+  % de la meta), además del arco de progreso que ya existía (se
+  mantuvo, no se reemplazó). El agua usa `var(--{tone})` y
+  `var(--{tone}-tint)` — los mismos tokens de color que ya usa el resto
+  del anillo (primary/success/danger) — así que no hizo falta agregar
+  variables nuevas ni tocar la paleta.
+- **Detalles técnicos:** el path de cada ola se genera una sola vez
+  (`buildWavePath`, fuera del componente) y se traslada por CSS
+  (`transform: translateY()` para el nivel, con la misma transición
+  suave que ya tenía el arco; `translateX` en loop infinito por
+  keyframes para el movimiento horizontal) en vez de recalcular el path
+  SVG en cada render — más barato. El `clipPath` que recorta el agua
+  al círculo interno usa un id único vía `useId()` (no un id fijo) por
+  si el anillo se llega a renderizar dos veces en la misma pantalla más
+  adelante (ej. si se agrega a un resultado de setup, como hace el
+  mockup de v0).
+- **Accesibilidad:** el loop horizontal de las ondas se apaga bajo
+  `prefers-reduced-motion` (igual que ya hacían el pulso/glow de
+  celebración); la transición vertical del nivel se deja activa porque
+  es la misma clase de transición que ya tenía el arco sin ese guard.
+- **Verificado:** `npm run build` limpio, `oxlint` sin warnings nuevos
+  (10 preexistentes, ninguno en `RingProgress.jsx`/`.css`). Pendiente:
+  revisión visual manual de Kevin — que el efecto de agua se vea bien
+  en las 3 tonalidades (primary/success/danger), en claro y oscuro, con
+  `prefers-reduced-motion` activado y desactivado, y que la transición
+  del nivel al registrar un trago se sienta fluida.
+- **Commit:** pendiente (branch `feat/anillo-agua-animada`).
+
 ## Pendiente
 
 Consolidado desde el README (que tenía ítems ya cerrados mezclados con
