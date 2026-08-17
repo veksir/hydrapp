@@ -89,6 +89,16 @@ export function InsightsSkeleton() {
           </div>
         ))}
       </div>
+      <div className="card" style={{ padding: 18 }}>
+        <SkeletonBlock width="55%" height="13px" style={{ marginBottom: 16 }} />
+        <SkeletonBlock width="100%" height="120px" radius="var(--radius-md)" />
+      </div>
+      <div className="card" style={{ padding: 18, display: "flex", flexDirection: "column", gap: 14 }}>
+        <SkeletonBlock width="65%" height="13px" />
+        {[0, 1, 2].map((i) => (
+          <SkeletonBlock key={i} width="100%" height="8px" radius="4px" />
+        ))}
+      </div>
     </SkeletonGroup>
   );
 }

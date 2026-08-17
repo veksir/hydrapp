@@ -396,6 +396,67 @@ del contexto de producto; este archivo es solo para lo operativo/pendiente.
   del nivel al registrar un trago se sienta fluida.
 - **Commit:** pendiente (branch `feat/anillo-agua-animada`).
 
+### Gráficas reales en Insights (idea tomada de la propuesta de v0.dev)
+- **Origen:** misma propuesta de v0.dev de la que se tomó el anillo
+  animado. Se tomó la idea de tener gráficas reales en la pantalla
+  Insights del mockup — no el código (Next.js/Tailwind/recharts) ni la
+  paleta.
+- **Primera versión (descartada durante la revisión de Kevin):** una
+  barra de consumo de los últimos 7-8 días con línea de meta, calcada
+  del mockup. Kevin notó que duplicaba a `HistoryChart` de Historial
+  (misma pregunta — "¿qué tomé cada día?" — solo que en barras en vez
+  de línea, y 7 días en vez de 30). Se cambió por un **patrón agregado
+  por día de la semana** ("¿qué días tomo menos, en promedio?"), que
+  Historial no puede responder porque es cronológico, no agregado —
+  información genuinamente nueva, no el mismo dato con otro dibujo.
+- **Backend (`backend/routes/insights.js`):** se agregaron 2 campos
+  nuevos a la respuesta de `GET /api/insights`, aditivos:
+  - `weekday_pattern`: agrupa los últimos 30 días por día de semana
+    (lunes..domingo) y calcula el % promedio de meta cumplida por día.
+    Solo cuenta un día si tiene ≥2 muestras (una sola ocurrencia no es
+    un patrón), y el array completo es `null` si menos de 4 días de la
+    semana tienen suficiente dato — mismo criterio cauteloso que ya
+    usa `heat_effect` (mínimo 3+3 antes de mostrar nada), para no
+    mostrarle a alguien con pocos días de uso un "patrón" que en
+    realidad es una coincidencia de una sola semana.
+  - `drink_breakdown`: `SUM(effective_ml)` (ml YA ajustados por el
+    factor de hidratación, no el volumen crudo) agrupado por
+    `drink_type` en los últimos 30 días, con label y `pct` del total.
+    Usa los labels de `backend/utils/drinkTypes.js` que ya existían.
+  - **Verificado con datos reales**, no solo sintaxis: se levantó el
+    backend localmente dos veces — una con 30 registros sintéticos
+    variados para probar `drink_breakdown`, y otra con 96 registros
+    sintéticos a lo largo de 28 días simulando fines de semana flojos
+    (200ml × 2 tomas sáb/dom vs. 500ml × 4 tomas el resto) para
+    confirmar que `weekday_pattern` detecta el patrón real: sáb 22%,
+    dom 12%, resto 42-62% — el resultado esperado.
+- **Frontend:** dos componentes nuevos, mismo patrón SVG-puro-sin-
+  librerías que ya usa `HistoryChart.jsx` (no se agregó ninguna
+  dependencia de gráficas):
+  - `WeekdayPatternChart.jsx`/`.css` — barra por día de la semana,
+    coloreada con el mismo criterio de 3 niveles que ya usa
+    `HistoryCalendar` (≥80% éxito/verde, 40-79% alerta/amarillo, <40%
+    riesgo/rojo — con su misma leyenda). La primera versión de esta
+    gráfica (la que mostraba últimos 7 días) usaba un binario
+    verde/gris que Kevin marcó como inconsistente con esa convención
+    ya establecida; se corrigió al cambiar de gráfica, no quedó deuda.
+  - `DrinkBreakdown.jsx`/`.css` — lista de barras horizontales con el
+    % de cada tipo de bebida, mismo patrón visual que otras barras de
+    progreso de la app.
+  - Insertados en `Insights.jsx` debajo del callout de calor
+    existente. El contenedor `.insights` ya es `flex-column` con
+    `gap`, así que no hizo falta CSS de layout nuevo.
+  - `InsightsSkeleton` (en `PageSkeletons.jsx`) actualizado con dos
+    bloques más para que la silueta de carga coincida con el
+    contenido nuevo.
+- **Verificado:** `npm run build` limpio, `oxlint` sin warnings nuevos
+  (10 preexistentes, ninguno en los archivos tocados/nuevos). Pendiente:
+  revisión visual manual de Kevin — que las gráficas se vean bien en
+  claro/oscuro, con datos reales de varios días y varios tipos de
+  bebida, y el caso de "todavía no hay datos suficientes" (usuario
+  nuevo, o con menos de 4 días de semana distintos representados).
+- **Commit:** pendiente (branch `feat/graficas-insights`).
+
 ## Pendiente
 
 Consolidado desde el README (que tenía ítems ya cerrados mezclados con
@@ -415,8 +476,6 @@ cerrar cada ítem, moviéndolo a "Bugs resueltos" o "Features cerrados".
   formulario largo en 2 pasos.
 - Pantalla "Perfil" como resumen — hoy el ícono de perfil en el nav va
   directo al formulario de edición, no a una vista de resumen.
-- Sparklines/gráficas reales en **Insights** (Historial ya las tiene desde
-  el feature de calendario/gráfica de tendencia).
 - Transiciones entre pantallas de la navegación.
 
 ### Exploratorio (v2, sin comprometer fecha)

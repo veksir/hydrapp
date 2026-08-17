@@ -108,7 +108,6 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 **Pendiente de esta pasada de diseño:**
 - Onboarding paso a paso (el flujo actual sigue siendo un formulario en 2 pasos, no los 6 pasos cortos del concepto).
 - Pantalla de "Perfil" como resumen (hoy el ícono de perfil en el nav va directo al formulario de edición, no a una vista de resumen).
-- Gráficas/sparklines reales en Insights (Historial ya las tiene, ver sección 10).
 - Transiciones entre pantallas de la navegación.
 
 > Historial en vista calendario: **cerrado**, ver sección 10 de este README.
@@ -116,6 +115,7 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 > Contraste de verdes (WCAG AA): **cerrado**, ver CLAUDE.md.
 > Skeletons/shimmer en estados de carga: **cerrado**, ver CLAUDE.md.
 > Confeti al cumplir la meta: **cerrado**, ver CLAUDE.md (el cambio de color del anillo ya estaba implementado desde antes).
+> Gráficas reales en Insights: **cerrado**, ver CLAUDE.md (idea tomada de la misma propuesta de v0.dev que el anillo animado).
 
 **Modo oscuro (hecho):** ver sección 10.
 

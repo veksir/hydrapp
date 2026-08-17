@@ -3,6 +3,7 @@ const db = require("../db/init");
 const { requireAuth } = require("../utils/auth-middleware");
 const { localDateStr, offsetModifier } = require("../utils/time");
 const { goalForDate } = require("../utils/historicalGoal");
+const { DRINK_TYPES } = require("../utils/drinkTypes");
 
 const router = express.Router();
 router.use(requireAuth);
@@ -43,6 +44,8 @@ router.get("/", (req, res) => {
         best_day: null,
         current_streak_days: 0,
         heat_effect: null,
+        weekday_pattern: null,
+        drink_breakdown: [],
       });
     }
 
@@ -101,6 +104,57 @@ router.get("/", (req, res) => {
       }
     }
 
+    // Patrón por día de la semana (Historial ya cubre "qué pasó el día X",
+    // esto responde una pregunta distinta: "en promedio, ¿qué días tomo
+    // menos?"). Se agrupan los últimos 30 días por día de semana; solo se
+    // incluye un día si tiene al menos 2 muestras (una sola ocurrencia no
+    // es un patrón, es ruido), y el conjunto completo solo se devuelve si
+    // hay al menos 4 días de la semana distintos con dato suficiente —
+    // mismo espíritu cauteloso que ya usa heat_effect (mínimo 3+3 antes
+    // de mostrar nada) para no mostrar un "patrón" que en realidad es una
+    // sola semana de coincidencia.
+    const WEEKDAY_ORDER = [1, 2, 3, 4, 5, 6, 0]; // lunes..domingo (JS getDay: 0=domingo)
+    const byWeekday = new Map();
+    for (const r of withGoal) {
+      const wd = new Date(r.date + "T12:00:00").getDay();
+      if (!byWeekday.has(wd)) byWeekday.set(wd, []);
+      byWeekday.get(wd).push(r.pct);
+    }
+    const weekdayEntries = WEEKDAY_ORDER.map((wd) => {
+      const pcts = byWeekday.get(wd) ?? [];
+      if (pcts.length < 2) return { weekday: wd, sample_count: pcts.length, avg_pct: null };
+      const avg = pcts.reduce((a, b) => a + b, 0) / pcts.length;
+      return { weekday: wd, sample_count: pcts.length, avg_pct: Math.round(avg * 100) };
+    });
+    const daysWithData = weekdayEntries.filter((e) => e.avg_pct !== null).length;
+    const weekdayLabels = ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"];
+    const weekdayPattern =
+      daysWithData >= 4
+        ? weekdayEntries.map((e) => ({ ...e, label: weekdayLabels[e.weekday] }))
+        : null;
+
+    // Desglose por tipo de bebida en los últimos 30 días (agua vs. café,
+    // té, jugo, etc.) — ml EFECTIVOS (post-factor de hidratación), no el
+    // volumen bebido crudo, para que el desglose refleje lo que realmente
+    // aportó a la meta.
+    const drinkRows = db
+      .prepare(
+        `SELECT drink_type, SUM(effective_ml) as ml
+         FROM water_logs
+         WHERE user_id = ? AND date(logged_at, ?) >= ?
+         GROUP BY drink_type
+         ORDER BY ml DESC`
+      )
+      .all(req.userId, modifier, fromDate);
+    const drinkTotalMl = drinkRows.reduce((s, r) => s + r.ml, 0);
+    const drinkLabels = Object.fromEntries(DRINK_TYPES.map((d) => [d.id, d.label]));
+    const drinkBreakdown = drinkRows.map((r) => ({
+      drink_type: r.drink_type,
+      label: drinkLabels[r.drink_type] ?? r.drink_type,
+      ml: Math.round(r.ml),
+      pct: drinkTotalMl ? Math.round((r.ml / drinkTotalMl) * 100) : 0,
+    }));
+
     res.json({
       has_data: true,
       week_avg_ml: Math.round(weekAvg),
@@ -108,6 +162,8 @@ router.get("/", (req, res) => {
       best_day: bestDay ? { date: bestDay.date, consumed_ml: Math.round(bestDay.consumed_ml) } : null,
       current_streak_days: streak,
       heat_effect: heatEffect,
+      weekday_pattern: weekdayPattern,
+      drink_breakdown: drinkBreakdown,
     });
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message });

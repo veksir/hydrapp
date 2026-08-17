@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { api } from "../api";
 import { Thermometer } from "lucide-react";
 import { InsightsSkeleton } from "../components/PageSkeletons";
+import WeekdayPatternChart from "../components/WeekdayPatternChart";
+import DrinkBreakdown from "../components/DrinkBreakdown";
 
 export default function Insights() {
   const [data, setData] = useState(null);
@@ -68,6 +70,9 @@ export default function Insights() {
               <p>{data.heat_effect.message}</p>
             </div>
           )}
+
+          <WeekdayPatternChart days={data.weekday_pattern} />
+          <DrinkBreakdown items={data.drink_breakdown} />
         </>
       )}
     </div>
