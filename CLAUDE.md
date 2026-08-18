@@ -10,7 +10,7 @@ PWA de hidratación inteligente. Repo: github.com/veksir/hydrapp (autor: veksir 
 
 - `backend/` — Node.js + Express + SQLite (better-sqlite3, sync). Deploy en Render.
 - `frontend/` — React + Vite PWA. Deploy en Vercel.
-- Asistente conversacional vía Groq (llama-3.3-70b-versatile), sin memoria server-side.
+- Asistente conversacional vía Groq (openai/gpt-oss-120b), sin memoria server-side.
 - Push notifications con VAPID + web-push, scheduler interno cada 5 min.
 - Clima real vía Open-Meteo (sin API key).
 

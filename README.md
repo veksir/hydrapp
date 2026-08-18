@@ -80,7 +80,7 @@ En el dashboard, el botón "Usar mi ubicación" pide permiso de geolocalización
 ### Asistente conversacional (Groq)
 
 1. Crear una key gratis en https://console.groq.com
-2. Configurar en `backend/.env`: `GROQ_API_KEY=...` (opcional: `GROQ_MODEL`, por defecto `llama-3.3-70b-versatile`)
+2. Configurar en `backend/.env`: `GROQ_API_KEY=...` (opcional: `GROQ_MODEL`, por defecto `openai/gpt-oss-120b`)
 3. Sin esto configurado, la app funciona igual — el botón del asistente muestra un mensaje claro de que no está disponible, no un error genérico.
 
 El asistente conoce el perfil del usuario y su estado del día (peso, edad, actividad, meta, consumo actual) para personalizar respuestas sin pedir que se repita esa información, está limitado a temas de hidratación (redirige si se le pregunta otra cosa), y aclara que no reemplaza a un médico. El historial de la conversación se envía completo en cada request, sin memoria persistente en el servidor. Ver `backend/routes/assistant.js` y `backend/utils/assistant.js`.
