@@ -10,6 +10,30 @@ PWA de seguimiento de hidratación: calcula tu meta diaria de agua según peso, 
 
 **Notas de entorno:** el asistente funciona en local y producción; las notificaciones push requieren HTTPS (producción o `localhost`).
 
+## Contenido
+
+- [Funcionalidades principales](#funcionalidades-principales)
+- [Inicio rápido](#inicio-rápido)
+  - [Variables de entorno](#variables-de-entorno)
+- [Estructura](#estructura)
+  - [Scripts disponibles](#scripts-disponibles)
+- [1. Backend](#1-backend)
+  - [Endpoints principales](#endpoints-principales)
+  - [Motor de cálculo (tabla IOM y nivel de actividad)](#motor-de-cálculo-tabla-iom-y-nivel-de-actividad)
+  - [Seguridad](#seguridad)
+  - [Chequeo de síntomas](#chequeo-de-síntomas-no-es-diagnóstico-médico)
+  - [Clima real por ubicación](#clima-real-por-ubicación)
+  - [Asistente conversacional (Groq)](#asistente-conversacional-groq)
+- [2. Diseño](#2-diseño)
+- [3. Frontend](#3-frontend)
+- [4. Despliegue en producción](#4-despliegue-en-producción)
+- [5. Notificaciones push](#5-notificaciones-push)
+- [6. Otras mejoras](#6-otras-mejoras)
+- [7. Arreglos tras uso real](#7-arreglos-tras-uso-real)
+- [8. Qué sigue (v2)](#8-qué-sigue-v2)
+- [9. Deuda técnica conocida](#9-deuda-técnica-conocida-documentada-a-propósito)
+- [10. Modo oscuro e historial en calendario](#10-modo-oscuro-e-historial-en-calendario)
+
 ## Funcionalidades principales
 
 - **Meta personalizada:** tabla IOM para menores de 19 años y peso × nivel de actividad para adultos, ajustada por el clima y el ejercicio del día (ver [Motor de cálculo](#motor-de-cálculo-tabla-iom-y-nivel-de-actividad)).
