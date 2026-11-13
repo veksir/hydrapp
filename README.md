@@ -72,9 +72,31 @@ La base SQLite (`backend/db/hydrapp.sqlite`) se crea sola al arrancar. Ojo: `.en
 
 ```
 hydrapp/
-├── backend/     API en Node.js + Express + SQLite
-└── frontend/    App React + Vite, PWA instalable
+├── backend/
+│   ├── server.js         entrada de Express (CORS, Helmet, montaje de rutas)
+│   ├── routes/           auth, profile, containers, logs, symptoms, insights, push, assistant
+│   ├── utils/            cálculo de meta, predicción de sed, estados, push, asistente
+│   └── db/init.js        esquema y migraciones de SQLite
+├── frontend/
+│   ├── src/pages/        Dashboard, Historial, Insights, Perfil, Setup, Síntomas, Asistente, Login/Registro
+│   ├── src/components/   UI: anillo, gráficas, calendario, sheets, skeletons, diálogos
+│   ├── src/context/      autenticación y tema
+│   ├── src/sw.js         service worker (PWA y notificaciones push)
+│   └── public/           íconos y manifest
+├── CLAUDE.md             contexto operativo del proyecto
+└── README.md
 ```
+
+### Scripts disponibles
+
+| Directorio | Comando | Qué hace |
+|---|---|---|
+| `backend/` | `npm start` | Arranca la API sin recarga automática. |
+| `backend/` | `npm run dev` | Arranca la API con `node --watch`. |
+| `frontend/` | `npm run dev` | Servidor de desarrollo de Vite. |
+| `frontend/` | `npm run build` | Build de producción en `dist/`. |
+| `frontend/` | `npm run preview` | Sirve el build de producción en local. |
+| `frontend/` | `npm run lint` | Ejecuta `oxlint`. |
 
 ## 1. Backend
 
