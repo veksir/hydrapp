@@ -127,8 +127,8 @@ hydrapp/
 ```
 cd backend
 npm install
-cp .env.example .env      # ajusta JWT_SECRET y PORT si quieres
-node server.js             # o: npm run dev (con recarga automática)
+cp .env.example .env      # define NODE_ENV=development y/o un JWT_SECRET real
+npm start                 # o: npm run dev (con recarga automática)
 ```
 
 Por defecto queda escuchando en `http://localhost:4000`. La base de datos es un archivo SQLite (`backend/db/hydrapp.sqlite`) que se crea solo, no se necesita instalar ningún motor de base de datos aparte.
@@ -250,8 +250,8 @@ El asistente conoce el perfil del usuario y su estado del día (peso, edad, acti
 cd frontend
 npm install
 cp .env.example .env       # VITE_API_URL apuntando a tu backend
-npm run dev                 # desarrollo, http://localhost:5173
-npm run build                # genera dist/ listo para producción
+npm run dev                # desarrollo, http://localhost:5173
+npm run build              # genera dist/ listo para producción
 ```
 
 `npm run build` genera una PWA completa en `frontend/dist/` (manifest, service worker, ícono). Ese `dist/` es lo único que se necesita subir a hosting estático.
