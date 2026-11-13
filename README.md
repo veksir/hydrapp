@@ -250,8 +250,14 @@ Exponer el puerto 4000 (o el definido en `.env`) detrás de un proxy, por ejempl
 
 ```
 location /api/ {
-    proxy_pass http://localhost:4000/;
+    # Sin barra final: así se conserva el prefijo /api que esperan las rutas
+    # de Express. Con `proxy_pass http://localhost:4000/;` Nginx lo elimina
+    # y todas las peticiones terminan en 404.
+    proxy_pass http://localhost:4000;
     proxy_set_header Host $host;
+    # Necesarios para que TRUST_PROXY=1 vea la IP real del visitante.
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
 }
 ```
 
