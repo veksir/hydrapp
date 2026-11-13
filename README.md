@@ -10,6 +10,19 @@ PWA de seguimiento de hidratación: calcula tu meta diaria de agua según peso, 
 
 **Notas de entorno:** el asistente funciona en local y producción; las notificaciones push requieren HTTPS (producción o `localhost`).
 
+## Funcionalidades principales
+
+- **Meta personalizada:** tabla IOM para menores de 19 años y peso × nivel de actividad para adultos, ajustada por el clima y el ejercicio del día (ver [Motor de cálculo](#motor-de-cálculo-tabla-iom-y-nivel-de-actividad)).
+- **Predicción de sed:** aprende el ritmo real de consumo y avisa antes de que aparezca la sed.
+- **Registro en dos toques:** recipientes calibrados y toma parcial para termos, jarras y botellones.
+- **Tipos de bebida** con factor de hidratación real (agua, café, té, jugo, refresco, bebida deportiva, leche).
+- **Clima real** por geolocalización vía Open-Meteo, sin API key.
+- **Chequeo de síntomas** que distingue deshidratación de sobrehidratación (no es diagnóstico médico).
+- **Historial** en calendario tipo heatmap y gráfica de tendencia de 30 días.
+- **Insights:** promedios, racha, mejor día, efecto del calor, patrón por día de la semana y desglose por bebida.
+- **Asistente conversacional** (Groq, opcional) con contexto del perfil y del estado del día.
+- **PWA instalable** con notificaciones push, modo claro/oscuro y cola offline básica.
+
 ## Estructura
 
 ```
