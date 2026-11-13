@@ -3,11 +3,12 @@
 PWA de seguimiento de hidratación: calcula tu meta diaria de agua según peso, edad, actividad y clima, y avisa antes de que tengas sed.
 
 **Demo:** https://hydrapp-beta.vercel.app
+
 > El backend está en el plan gratuito de Render: tras un rato de inactividad puede tardar hasta un minuto en despertar. Si el primer registro falla, espera unos segundos y vuelve a intentar.
 
 **Stack:** React + Vite (PWA) · Node.js + Express · SQLite · JWT · Groq (asistente)
 
-Notas: el asistente funciona en local y producción; las notificaciones push solo en producción (requieren HTTPS).
+**Notas de entorno:** el asistente funciona en local y producción; las notificaciones push requieren HTTPS (producción o `localhost`).
 
 ## Estructura
 
