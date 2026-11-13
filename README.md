@@ -23,6 +23,51 @@ PWA de seguimiento de hidratación: calcula tu meta diaria de agua según peso, 
 - **Asistente conversacional** (Groq, opcional) con contexto del perfil y del estado del día.
 - **PWA instalable** con notificaciones push, modo claro/oscuro y cola offline básica.
 
+## Inicio rápido
+
+Requisitos: Node.js **20.19+** o **22.12+** (lo exige Vite 8) y npm.
+
+```bash
+git clone https://github.com/veksir/hydrapp.git
+cd hydrapp
+
+# Terminal 1 — API
+cd backend
+npm install
+cp .env.example .env
+# edita .env: NODE_ENV=development y un JWT_SECRET propio
+npm run dev            # http://localhost:4000
+
+# Terminal 2 — PWA
+cd frontend
+npm install
+cp .env.example .env   # VITE_API_URL=http://localhost:4000/api
+npm run dev            # http://localhost:5173
+```
+
+La base SQLite (`backend/db/hydrapp.sqlite`) se crea sola al arrancar. Ojo: `.env.example` trae `NODE_ENV=production` y un `JWT_SECRET` de ejemplo; el backend se niega a arrancar en producción con ese placeholder. En local usa `NODE_ENV=development` (secreto efímero) o define un secreto real.
+
+### Variables de entorno
+
+**Backend** (`backend/.env`):
+
+| Variable | Requerida | Descripción |
+|---|---|---|
+| `PORT` | No | Puerto de la API. Por defecto `4000`. |
+| `JWT_SECRET` | Sí en producción | Secreto para firmar los JWT. En desarrollo, si falta, se genera uno efímero por arranque. |
+| `NODE_ENV` | No | `production` activa el arranque fail-closed sin `JWT_SECRET`. |
+| `FRONTEND_ORIGIN` | No | Orígenes permitidos por CORS, separados por coma. Vacío = abierto. |
+| `TRUST_PROXY` | No | `1` cuando hay un proxy delante (Nginx), para que el rate limiting use la IP real. |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | No | Notificaciones push. Generar con `npx web-push generate-vapid-keys`. |
+| `GROQ_API_KEY` | No | Asistente conversacional. Sin ella, la app funciona igual. |
+| `GROQ_MODEL` | No | Modelo de Groq. Por defecto `openai/gpt-oss-120b`. |
+
+**Frontend** (`frontend/.env`):
+
+| Variable | Requerida | Descripción |
+|---|---|---|
+| `VITE_API_URL` | Sí | URL base de la API, incluido `/api` (ej. `http://localhost:4000/api`). |
+
 ## Estructura
 
 ```
