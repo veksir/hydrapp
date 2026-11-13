@@ -299,6 +299,9 @@ Requiere HTTPS real en producción (los navegadores no permiten push sobre HTTP 
 
 Bugs encontrados usando la app, no solo leyendo código:
 
+<details>
+<summary>Historial completo de las 7 vueltas de correcciones</summary>
+
 **Primera vuelta**
 - **Estado "Concentración/Rendimiento" casi nunca en verde**: el umbral de "atrasado" era un valor fijo de 150ml, sin importar el tamaño de la meta — para una meta de 3300ml eso es apenas 4.5% de margen. Ahora los umbrales son proporcionales a la meta (~10%/25%) y hay un margen de gracia de 30 minutos al despertar. Ver `backend/utils/predictor.js`.
 - **Mensaje contradictorio al superar la meta**: si ya se había tomado más del objetivo del día pero llevaba rato sin registrar nada, la predicción de sed igual sugería tomar agua. Ahora, si la meta ya está cumplida/superada, ese mensaje no se muestra. Ver `backend/utils/dailyStatus.js`.
@@ -328,6 +331,8 @@ Bugs encontrados usando la app, no solo leyendo código:
 
 **Séptima vuelta (13-ago, recomendaciones de reposición)**
 - **Las recomendaciones de "ponerse al día" empujaban a tomar mucha agua de golpe**: al llevar mucho rato sin tomar agua, el déficit crecía y el mensaje lo reportaba como objetivo inmediato ("Vas 1800ml por detrás de tu ritmo esperado. Toma agua ahora."), invitando a recuperarlo de una vez — justo lo que la misma app desaconseja (el cuerpo absorbe mejor el agua distribuida que en una gran toma única, ver `logFeedback.js`). Ahora los dos estados atrasados, en español neutro, se alinearon a la recuperación gradual: muy atrasado reporta el déficit con honestidad y la recuperación la retoma la app — "Vas 1764ml por detrás de tu ritmo. Registra un vaso ahora y retoma tu ritmo normal — no intentes recuperar todo de una sola vez." — y atrasado deja de prometer que un vaso te pone al día ("Un vaso ahora te acerca — sigue registrando."), porque el déficit suele superar el tamaño de un vaso. La acción siempre es en la unidad real de la app (un vaso), sin tope para la sed y sin incentivar subconsumo. El asistente (Groq) recibió la misma regla en su prompt. Ver `backend/utils/predictor.js`, `backend/utils/assistant.js`.
+
+</details>
 
 ## 8. Qué sigue (v2)
 
