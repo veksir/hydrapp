@@ -113,21 +113,32 @@ Por defecto queda escuchando en `http://localhost:4000`. La base de datos es un 
 
 | Método | Ruta | Qué hace |
 |---|---|---|
+| GET | `/api/health` | Estado del servicio (sin autenticación) |
 | POST | `/api/auth/register` | Crear cuenta |
 | POST | `/api/auth/login` | Iniciar sesión |
 | GET/PUT | `/api/profile` | Ver/guardar perfil (peso, edad, sexo, clima, horarios...) |
-| GET/POST/DELETE | `/api/containers` | Recipientes calibrados por el usuario |
-| PUT | `/api/containers/:id` | Editar recipiente (nombre, volumen, tipo, contenido) |
+| GET/POST | `/api/containers` | Listar/crear recipientes calibrados del usuario |
+| PUT/DELETE | `/api/containers/:id` | Editar/eliminar recipiente (nombre, volumen, tipo, contenido) |
 | POST | `/api/containers/:id/sip` | Toma parcial de un recipiente con seguimiento (decanta del volumen restante) |
+| PUT | `/api/containers/:id/refill` | Marcar el recipiente como lleno (reinicia el volumen restante) |
+| GET | `/api/logs/drink-types` | Tipos de bebida y su factor de hidratación |
 | POST | `/api/logs` | Registrar un consumo de agua |
+| DELETE | `/api/logs/:id` | Borrar un registro |
 | GET | `/api/logs/today` | Meta del día, consumido, predicción de ritmo, insumos usados |
 | PUT | `/api/logs/context/today` | Ajustar actividad/clima del día puntual (update parcial) |
-| GET | `/api/logs/history?days=14` | Historial agregado por día |
+| GET | `/api/logs/history?days=14` | Historial agregado por día (hasta 90) |
 | GET | `/api/symptoms/catalog` | Lista de síntomas para el chequeo |
 | POST | `/api/symptoms/check` | Evalúa síntomas reportados vs ritmo de consumo de hoy |
+| GET | `/api/insights` | Promedios, racha, efecto del calor, patrón semanal y desglose por bebida |
+| GET | `/api/push/vapid-public-key` | Clave pública VAPID para suscribirse a push |
+| POST | `/api/push/subscribe` | Guardar una suscripción push |
+| POST | `/api/push/unsubscribe` | Eliminar una suscripción push |
 | GET | `/api/push/subscriptions` | Endpoints de push guardados del usuario (el frontend lo usa para no mostrar "activado" si el backend perdió la suscripción) |
+| POST | `/api/push/test` | Enviar una notificación de prueba |
+| GET | `/api/assistant/status` | Indica si el asistente está configurado |
+| POST | `/api/assistant/chat` | Enviar mensajes al asistente (limitado por ráfaga) |
 
-Todas menos `register`/`login` requieren header `Authorization: Bearer <token>`.
+Salvo `register`, `login` y `health`, todas requieren el header `Authorization: Bearer <token>`.
 
 ### Motor de cálculo (tabla IOM y nivel de actividad)
 
